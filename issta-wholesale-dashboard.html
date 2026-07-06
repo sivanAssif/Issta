@@ -90,6 +90,11 @@ td .hint{display:block;font-size:12px;color:var(--ink-faint);margin-top:2px}
   padding:6px 10px;font-size:13px}
 #stMenu button:hover{background:var(--accent-soft)}
 #stMenu button.cur{font-weight:700;background:#f0eee7}
+.owner-btn{border:1px solid var(--line);background:#fbfaf7;border-radius:12px;padding:2px 11px;
+  font-size:12.5px;font-weight:600;color:var(--ink);white-space:nowrap;cursor:pointer}
+.owner-btn:hover{border-color:var(--accent);color:var(--accent)}
+.owner-btn::after{content:" ▾";font-size:9px;opacity:.55}
+.owner-btn.unassigned{background:var(--crit-bg);color:var(--crit);border-color:#eac3bc}
 .tbtn:disabled{opacity:.4;cursor:default}
 
 /* milestones */
@@ -174,7 +179,7 @@ footer{margin-top:50px;font-size:12px;color:var(--ink-faint);border-top:1px soli
   </section>
 
   <section id="sec-qa">
-    <div class="sec-head"><h2>תחום 2 · בדיקות — מטריצת סנריו</h2><span class="owner-tag">אחראים: תומר (פיתוח) + ניתי (QA)</span>
+    <div class="sec-head"><h2>תחום 2 · בדיקות — מטריצת סנריו</h2><span class="owner-tag">אחראית: ניתי (QA) · מלווה: תומר (פיתוח)</span>
       <span class="why">לכל סנריו "אבא ואמא": אחראי מהגילוי ועד תיקון, אימות ושיקוף — לא נופל בין הכיסאות.</span></div>
     <div class="sec-goal"><b>התוצר:</b> מטריצת סנריו משוקפת ללקוח — הלקוח רואה מה בודקים, נותן פידבק, וההערות שלו נכנסות לטבלה. תאריך יעד = בדוק + מה שהתגלה תוקן + משתקף בזינוק. <b>למה זה חשוב:</b> שלא יקרה שרגע לפני עלייה הלקוח שואל "מה עם זה?" ואף אחד לא מכיר. <b>איך לגשת:</b> ב-13.7 מפרסמים ללקוח את המטריצה המלאה, ממנים אחראי לכל סנריו, ומגדירים "הכרזנו סיימנו" ל-31.8. סנריו שיונתן מכיר לבדו — לתעדף לפני 18.7.</div>
     <div id="tbl-qa"></div>
@@ -195,7 +200,7 @@ footer{margin-top:50px;font-size:12px;color:var(--ink-faint);border-top:1px soli
   </section>
 
   <section id="sec-gov">
-    <div class="sec-head"><h2>תחום 5 · בקרה וקצב</h2><span class="owner-tag">אחראיות: נלי (PM) + סיוון (תפעול)</span>
+    <div class="sec-head"><h2>תחום 5 · בקרה וקצב</h2><span class="owner-tag">אחראית: נלי (PM) · מלווה: סיוון (תפעול)</span>
       <span class="why">הקצב הוא המנגנון שמונע את ה"בלאגן": כל אחד יודע מתי הוא מדווח ועל מה.</span></div>
     <div class="sec-goal"><b>המנגנון:</b> ① דיילי 15 דק' (או אסינכרוני) — כל בעל תחום: מה זז, מה תקוע. ② ישיבת בקרה שבועית — מעבר על הדשבורד הזה: חסמים, תאריכים בסיכון, החלטות. ③ דיווח שבועי למנכ"לית — RAG + חסמים להחלטתה בלבד. ④ Go/No-Go ב-15.9 עם קריטריונים שנקבעו מראש (למטה). <b>עיקרון:</b> חסם שלא שוחרר תוך 48 שעות — עולה למנכ"לית אוטומטית.</div>
     <div id="tbl-gov"></div>
@@ -227,6 +232,7 @@ footer{margin-top:50px;font-size:12px;color:var(--ink-faint);border-top:1px soli
 
 <script>
 const STATUSES=["טרם התחיל","בתהליך","חסום","הושלם","בסיכון"];
+const PEOPLE=["נלי","עדי","תומר","ניתי","דניס","יונתן","סיוון","נחמה","גלאור",'מנכ"לית',"טרם מונה"];
 const GO_LIVE=new Date(2026,8,30);
 const DEFAULT_DATA={
 decisions:[
@@ -274,8 +280,8 @@ qa:[
  {t:"E2E התחשבנות: Flight Summary, שוברים, Refund, Split, חשבוניות סוכן",o:"דניס",d:"15.8",c:"ישוקף",s:0},
  {t:"E2E חבילות: מטריצה, ביטולים, Family Plan, שידור להפצה",o:"ניתי",d:"22.8",c:"ישוקף",s:0},
  {t:"E2E שוברי סוכן (AVC): קליטה, שגיאות, התראות, ולידציות",o:"דניס",d:"22.8",c:"ישוקף",s:0},
- {t:"\"הכרזנו סיימנו\" — הצגת כל הסנריו ללקוח: מה נבדק, מה נמצא, מה תוקן",o:"תומר+נלי",d:"31.8",c:"מצגת ללקוח",s:0},
- {t:"רגרסיה מלאה עם יונתן + ליווי UAT של הלקוח",o:"יונתן+ניתי",d:"12.9",c:"UAT",s:0}
+ {t:"\"הכרזנו סיימנו\" — הצגת כל הסנריו ללקוח: מה נבדק, מה נמצא, מה תוקן",o:"נלי",h:"תומר",d:"31.8",c:"מצגת ללקוח",s:0},
+ {t:"רגרסיה מלאה עם יונתן + ליווי UAT של הלקוח",o:"ניתי",h:"יונתן",d:"12.9",c:"UAT",s:0}
 ],
 interfaces:[
  {n:"ביפרו (Bpro)",st:"בפיתוח (מיכאל) — אין מועד סיום",o:"טרם מונה",d:"15.8",nx:"לקבל תאריך מחייב; קשר יומי; להכין בדיקות מראש",s:2},
@@ -287,7 +293,7 @@ interfaces:[
 ],
 training:[
  {t:"מיפוי כל ההדרכות שנותרו + שיבוץ מול הלקוח עד 14.9",o:"דניס",d:"15.7",s:1},
- {t:"תבנית \"דף עזר ללקוח\" לפי תהליכי העבודה שלו (עם סיוון) — לא גנרי",o:"דניס+סיוון",d:"20.7",s:0},
+ {t:"תבנית \"דף עזר ללקוח\" לפי תהליכי העבודה שלו — לא גנרי",o:"דניס",h:"סיוון",d:"20.7",s:0},
  {t:"נוהל: הקלטה לכל הדרכה + שליחת דף עזר באותו יום",o:"דניס",d:"20.7",s:0},
  {t:"מנגנון וידוא הבנה: שאלון קצר / תרגול מעשי אחרי כל הדרכה",o:"דניס",d:"27.7",s:0},
  {t:"הדרכות תפעול שוטף: טיסות, סדרות, חבילות",o:"דניס",d:"22.8",s:0},
@@ -354,6 +360,8 @@ async function boot(){
     syncNote("מצב לא מקוון — מוצגת הגרסה המקומית");
   }
   for(const k in DEFAULT_DATA)if(!D[k])D[k]=structuredClone(DEFAULT_DATA[k]);
+  for(const k in D)if(Array.isArray(D[k]))D[k].forEach(r=>{
+    if(r&&typeof r.o==="string"&&r.o.includes("+")){const parts=r.o.split("+").map(s=>s.trim());r.o=parts[0];if(!r.h)r.h=parts.slice(1).join(", ");}});
   render();
   const t=new Date();$("#lastUpd").textContent=t.toLocaleDateString("he-IL")+" "+t.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
 }
@@ -387,6 +395,10 @@ addEventListener("beforeunload",e=>{if(isDirty()&&localStorage.getItem("gh-token
 
 function pill(s,key,i){return `<button class="pill st-${s}" data-k="${key}" data-i="${i}" title="לחיצה לבחירת סטטוס">${STATUSES[s]}</button>`}
 function ed(key,i,f,v,hint){return `<span contenteditable data-k="${key}" data-i="${i}" data-f="${f}">${esc(v)}</span>${hint?`<span class="hint">${esc(hint)}</span>`:""}`}
+function ownerCell(key,i,r){
+  const o=r.o||"טרם מונה",un=(!r.o||r.o==="טרם מונה")?" unassigned":"";
+  return `<button class="owner-btn${un}" data-ok="${key}" data-i="${i}" title="לחיצה לבחירת אחראי">${esc(o)}</button>
+  <span class="hint">מסייע/ת: <span contenteditable data-k="${key}" data-i="${i}" data-f="h">${esc(r.h||"")}</span></span>`}
 function dueCls(d){
   const m=/^(\d{1,2})\.(\d{1,2})/.exec(String(d||""));if(!m)return"";
   const dt=new Date(2026,+m[2]-1,+m[1]),days=(dt-new Date())/864e5;
@@ -398,6 +410,7 @@ function table(el,key,cols,rows,newRow){
     rows.map((r,i)=>`<tr>${cols.map(c=>{
       if(c.f==="s")return `<td>${pill(r.s,key,i)}</td>`;
       if(c.f==="d")return `<td class="num ${dueCls(r.d)}">${ed(key,i,"d",r.d)}</td>`;
+      if(c.f==="o")return `<td>${ownerCell(key,i,r)}</td>`;
       return `<td>${ed(key,i,c.f,r[c.f])}</td>`;
     }).join("")}<td><button class="rowdel" data-k="${key}" data-i="${i}" title="מחיקת שורה">✕</button></td></tr>`).join("")+
     `</tbody></table></div><button class="addrow" data-k="${key}">+ הוספת שורה</button>`;
@@ -435,7 +448,7 @@ function renderAll(){
     rows.map(({dom,i,r})=>`<tr>
       <td><a href="#sec-${({changes:"chg",qa:"qa",interfaces:"if",training:"train",governance:"gov",blockers:"block",decisions:"dec"})[dom.k]}" style="color:var(--accent);text-decoration:none;font-weight:600">${dom.label}</a></td>
       <td>${ed(dom.k,i,dom.tf,r[dom.tf])}</td>
-      <td>${dom.of?ed(dom.k,i,dom.of,r[dom.of]):'מנכ"לית'}</td>
+      <td>${dom.of?ownerCell(dom.k,i,r):'מנכ"לית'}</td>
       <td class="num ${dueCls(r[dom.df])}">${ed(dom.k,i,dom.df,r[dom.df])}</td>
       <td>${pill(r.s,dom.k,i)}</td></tr>`).join("")+
     `</tbody></table></div>`;
@@ -505,12 +518,18 @@ document.addEventListener("keydown",e=>{
 
 /* status picker menu */
 const stMenu=document.createElement("div");stMenu.id="stMenu";document.body.appendChild(stMenu);
-let stTarget=null;
-function openStMenu(p){
-  stTarget=p;
-  const cur=D[p.dataset.k][+p.dataset.i].s;
-  stMenu.innerHTML=STATUSES.map((s,idx)=>
-    `<button data-s="${idx}" class="${idx===cur?"cur":""}"><span class="pill st-${idx}">${s}</span></button>`).join("");
+let stTarget=null,stMode="status";
+function openStMenu(p,mode){
+  stTarget=p;stMode=mode;
+  const row=D[p.dataset.k||p.dataset.ok][+p.dataset.i];
+  if(mode==="status"){
+    stMenu.innerHTML=STATUSES.map((s,idx)=>
+      `<button data-s="${idx}" class="${idx===row.s?"cur":""}"><span class="pill st-${idx}">${s}</span></button>`).join("");
+  }else{
+    stMenu.innerHTML=PEOPLE.map(n=>
+      `<button data-v="${esc(n)}" class="${n===row.o?"cur":""}">${esc(n)}</button>`).join("")+
+      `<button data-v="__other">שם אחר…</button>`;
+  }
   stMenu.style.display="block";
   const r=p.getBoundingClientRect();
   stMenu.style.top=(r.bottom+scrollY+4)+"px";
@@ -518,15 +537,23 @@ function openStMenu(p){
 }
 function closeStMenu(){stMenu.style.display="none";stTarget=null;}
 stMenu.addEventListener("click",e=>{
-  const b=e.target.closest("button[data-s]");if(!b||!stTarget)return;
-  snapshot();
-  D[stTarget.dataset.k][+stTarget.dataset.i].s=+b.dataset.s;
-  closeStMenu();save();render();
+  if(!stTarget)return;
+  const key=stTarget.dataset.k||stTarget.dataset.ok,i=+stTarget.dataset.i;
+  const bs=e.target.closest("button[data-s]");
+  if(bs){snapshot();D[key][i].s=+bs.dataset.s;closeStMenu();save();render();return}
+  const bv=e.target.closest("button[data-v]");
+  if(bv){
+    let v=bv.dataset.v;
+    if(v==="__other"){v=(prompt("שם האחראי:")||"").trim();if(!v)return;}
+    snapshot();D[key][i].o=v;closeStMenu();save();render();
+  }
 });
 
 document.body.addEventListener("click",e=>{
   const p=e.target.closest(".pill[data-k]");
-  if(p){e.stopPropagation();stTarget===p?closeStMenu():openStMenu(p);return}
+  if(p){e.stopPropagation();stTarget===p?closeStMenu():openStMenu(p,"status");return}
+  const ob=e.target.closest(".owner-btn[data-ok]");
+  if(ob){e.stopPropagation();stTarget===ob?closeStMenu():openStMenu(ob,"owner");return}
   if(!e.target.closest("#stMenu"))closeStMenu();
   const del=e.target.closest(".rowdel");
   if(del&&confirm("למחוק את השורה?")){snapshot();D[del.dataset.k].splice(+del.dataset.i,1);save();render();return}
