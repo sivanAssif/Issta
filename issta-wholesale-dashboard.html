@@ -1,0 +1,499 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>איסתא סיטונאות — בקרת עלייה לאוויר 30.9</title>
+<style>
+:root{
+  --ink:#1c2b3a; --ink-soft:#4a5a6a; --ink-faint:#8494a4;
+  --ground:#f7f6f2; --card:#ffffff; --line:#e3e0d8;
+  --accent:#1f5fa8; --accent-soft:#e8eff8;
+  --good:#2e7d46; --good-bg:#e7f2ea;
+  --warn:#b06e0f; --warn-bg:#faf1de;
+  --crit:#c0392b; --crit-bg:#fae8e5;
+  --hold:#5a6a7a; --hold-bg:#eceff2;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--ground);color:var(--ink);direction:rtl;
+  font-family:"Segoe UI","Noto Sans Hebrew",Arial,sans-serif;font-size:15px;line-height:1.55}
+main{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+h1,h2,h3{text-wrap:balance;margin:0}
+[contenteditable]{border-radius:3px;outline:none;min-width:1.5em}
+[contenteditable]:hover{background:#fdf9e9}
+[contenteditable]:focus{background:#fdf4cf;box-shadow:0 0 0 2px #e8d48a}
+button{font:inherit;cursor:pointer}
+button:focus-visible,.pill:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* top bar */
+.topbar{background:var(--ink);color:#f2f0ea;padding:26px 20px 22px}
+.topbar-in{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between}
+.brand small{display:block;letter-spacing:.14em;font-size:11px;color:#a8b6c4;text-transform:uppercase}
+.brand h1{font-size:26px;font-weight:600;color:#fff}
+.brand .sub{color:#c4cfd9;font-size:13px;margin-top:2px}
+.kpis{display:flex;gap:14px;flex-wrap:wrap}
+.kpi{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:10px 18px;min-width:118px;text-align:center}
+.kpi b{display:block;font-size:26px;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi span{font-size:12px;color:#b9c5d1}
+.kpi.rag b{font-size:17px;padding-top:5px}
+.rag-G b{color:#7ed09a}.rag-Y b{color:#f0c46a}.rag-R b{color:#f28b7d}
+
+/* toolbar */
+.toolbar{position:sticky;top:0;z-index:20;background:var(--ground);border-bottom:1px solid var(--line);
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:9px 0;margin-bottom:26px}
+.toolbar .spacer{flex:1}
+.tbtn{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 13px;font-size:13px;color:var(--ink-soft)}
+.tbtn:hover{border-color:var(--accent);color:var(--accent)}
+.tbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+#saveNote{font-size:12px;color:var(--ink-faint)}
+nav.jump{display:flex;gap:4px;flex-wrap:wrap}
+nav.jump a{font-size:12.5px;color:var(--ink-soft);text-decoration:none;padding:5px 10px;border-radius:14px}
+nav.jump a:hover{background:var(--accent-soft);color:var(--accent)}
+
+section{margin-bottom:44px}
+.sec-head{display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:7px;margin-bottom:4px}
+.sec-head h2{font-size:19px;font-weight:700}
+.sec-head .owner-tag{font-size:12.5px;color:var(--accent);background:var(--accent-soft);border-radius:12px;padding:2px 11px;font-weight:600}
+.sec-head .why{font-size:12.5px;color:var(--ink-faint);margin-inline-start:auto;max-width:46ch;text-align:left}
+.sec-goal{background:var(--card);border:1px solid var(--line);border-inline-start:4px solid var(--accent);
+  border-radius:6px;padding:10px 14px;margin:12px 0 14px;font-size:13.5px;color:var(--ink-soft)}
+.sec-goal b{color:var(--ink)}
+
+/* tables */
+.twrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:13.5px}
+th{background:#f0eee7;text-align:right;font-size:12px;letter-spacing:.04em;color:var(--ink-soft);
+  padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid #efede6;vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+td .hint{display:block;font-size:12px;color:var(--ink-faint);margin-top:2px}
+.rowdel{border:0;background:none;color:#c9c2b4;font-size:15px;padding:0 4px;line-height:1}
+.rowdel:hover{color:var(--crit)}
+.addrow{margin:10px 0 0;background:none;border:1px dashed var(--line);border-radius:6px;
+  padding:6px 14px;font-size:13px;color:var(--ink-faint);width:100%}
+.addrow:hover{color:var(--accent);border-color:var(--accent)}
+
+/* status pills */
+.pill{display:inline-block;border:0;border-radius:12px;padding:3px 12px;font-size:12px;font-weight:600;white-space:nowrap}
+.st-0{background:var(--hold-bg);color:var(--hold)}
+.st-1{background:var(--accent-soft);color:var(--accent)}
+.st-2{background:var(--crit-bg);color:var(--crit)}
+.st-3{background:var(--good-bg);color:var(--good)}
+.st-4{background:var(--warn-bg);color:var(--warn)}
+.due-late{color:var(--crit);font-weight:700}
+.due-soon{color:var(--warn);font-weight:700}
+.pill{cursor:pointer}
+.pill::after{content:" ▾";font-size:9px;opacity:.55}
+#stMenu{position:absolute;z-index:50;background:var(--card);border:1px solid var(--line);border-radius:8px;
+  box-shadow:0 6px 20px rgba(28,43,58,.18);padding:5px;display:none;min-width:130px}
+#stMenu button{display:block;width:100%;text-align:right;border:0;background:none;border-radius:6px;
+  padding:6px 10px;font-size:13px}
+#stMenu button:hover{background:var(--accent-soft)}
+#stMenu button.cur{font-weight:700;background:#f0eee7}
+.tbtn:disabled{opacity:.4;cursor:default}
+
+/* milestones */
+.mstones{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px;margin-top:14px}
+.ms{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:11px 13px;position:relative}
+.ms .d{font-size:12px;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700;letter-spacing:.03em}
+.ms p{margin:4px 0 8px;font-size:13px;line-height:1.45}
+.ms.done{opacity:.62}
+.ms .pill{font-size:11px}
+
+/* blockers */
+.blockers .twrap{border-inline-start:4px solid var(--crit)}
+.callout{background:var(--warn-bg);border:1px solid #ecd9ad;border-radius:8px;padding:12px 16px;margin:14px 0;font-size:13.5px}
+.callout b{color:var(--warn)}
+.cards2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:14px}
+.rcard{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 15px;font-size:13.5px}
+.rcard h3{font-size:14px;margin-bottom:5px;color:var(--crit)}
+.rcard.blue h3{color:var(--accent)}
+.rcard p{margin:0;color:var(--ink-soft)}
+.rcard ul{margin:6px 0 0;padding-inline-start:18px;color:var(--ink-soft)}
+.rcard li{margin-bottom:4px}
+footer{margin-top:50px;font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:12px}
+@media(max-width:700px){.sec-head{flex-wrap:wrap}.sec-head .why{display:none}}
+</style>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <small>Travel Booster · פרויקט אסטרטגי</small>
+      <h1>איסתא סיטונאות — חדר בקרה לעלייה לאוויר</h1>
+      <div class="sub">בקרה, מעקב ושחרור חסמים · מוגש למנכ"לית · עדכון אחרון: <span id="lastUpd">—</span></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><b id="daysLeft">—</b><span>ימים ל-30.9</span></div>
+      <div class="kpi rag" id="ragBox"><b id="ragTxt">—</b><span>סטטוס כולל</span></div>
+      <div class="kpi"><b id="blkCnt">—</b><span>חסמים פתוחים</span></div>
+      <div class="kpi"><b id="taskPct">—</b><span>משימות הושלמו</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <nav class="jump">
+      <a href="#sec-dec">החלטות מנכ"לית</a><a href="#sec-block">חסמים</a><a href="#sec-ms">אבני דרך</a><a href="#sec-chg">שינויים</a>
+      <a href="#sec-qa">בדיקות</a><a href="#sec-if">ממשקים</a><a href="#sec-train">הדרכות</a>
+      <a href="#sec-gov">בקרה</a><a href="#sec-risk">סיכונים</a><a href="#sec-all">כל המשימות</a>
+    </nav>
+    <div class="spacer"></div>
+    <span id="saveNote">נשמר אוטומטית בדפדפן זה</span>
+    <button class="tbtn" id="btnUndo" disabled title="ביטול השינוי האחרון (Ctrl+Z)">↩ ביטול פעולה</button>
+    <button class="tbtn" id="btnReset">איפוס לתבנית</button>
+  </div>
+
+  <div class="callout"><b>איך עובדים עם הדף:</b> כל טקסט ניתן לעריכה בלחיצה. לחיצה על תגית סטטוס פותחת תפריט לבחירת סטטוס. טעות? «↩ ביטול פעולה» (או Ctrl+Z) מחזיר את השינוי האחרון. השינויים נשמרים אוטומטית בדפדפן זה. תאריכים בפורמט DD.MM.</div>
+
+  <section id="sec-dec" class="blockers">
+    <div class="sec-head"><h2>שולחן המנכ"לית — החלטות פתוחות</h2>
+      <span class="why">שלוש ההחלטות שרק המנכ"לית יכולה לסגור. החלטה שהתקבלה — לתעד בעמודת ההחלטה ולסמן "הושלם".</span></div>
+    <div id="tbl-dec"></div>
+  </section>
+
+  <section id="sec-block" class="blockers">
+    <div class="sec-head"><h2>חסמים פתוחים — דורשים החלטה / הסלמה</h2>
+      <span class="why">השולחן של המנכ"לית: רק מה שתקוע ודורש התערבות. חסם שנפתר — לסמן "שוחרר".</span></div>
+    <div id="tbl-block"></div>
+  </section>
+
+  <section id="sec-ms">
+    <div class="sec-head"><h2>אבני דרך — תכנון לאחור מ-30.9</h2>
+      <span class="why">כל אבן דרך היא שער: לא עוברים הלאה בלי לסגור אותה או להחליט במודע לדחות.</span></div>
+    <div class="mstones" id="msGrid"></div>
+  </section>
+
+  <section id="sec-chg">
+    <div class="sec-head"><h2>תחום 1 · שינויים ופערים</h2><span class="owner-tag">אחראי: עדי (מוצר)</span>
+      <span class="why">שרשימת השינויים תפסיק להיות זרם אינסופי ותהפוך לרשימה סגורה ומנוהלת.</span></div>
+    <div class="sec-goal"><b>התוצר:</b> טבלת שינויים חיה — לכל שינוי: חובה/לא לעלייה לאוויר, סיכון (מה יכול להישבר), השפעה על flow הבדיקות ואיך בודקים. <b>למה זה חשוב:</b> בלי זה אין Code Freeze ואין דרך לדעת מה מסכן את ה-Go-Live. <b>איך לגשת:</b> לעבור על גרסאות 138–145 באקסל של נלי, לסווג כל פריט פתוח, ולהוסיף מדור "פערים שעוד יכולים לצוץ" — לחשוב על כל פינה קטנה, גם מה שנראה מובן מאליו.</div>
+    <div id="tbl-chg"></div>
+    <h3 style="font-size:15px;margin:22px 0 8px">פערים פוטנציאליים — "להגדיל ראש" (עדי מוסיף שוטף)</h3>
+    <div id="tbl-gap"></div>
+  </section>
+
+  <section id="sec-qa">
+    <div class="sec-head"><h2>תחום 2 · בדיקות — מטריצת סנריו</h2><span class="owner-tag">אחראים: תומר (פיתוח) + ניתי (QA)</span>
+      <span class="why">לכל סנריו "אבא ואמא": אחראי מהגילוי ועד תיקון, אימות ושיקוף — לא נופל בין הכיסאות.</span></div>
+    <div class="sec-goal"><b>התוצר:</b> מטריצת סנריו משוקפת ללקוח — הלקוח רואה מה בודקים, נותן פידבק, וההערות שלו נכנסות לטבלה. תאריך יעד = בדוק + מה שהתגלה תוקן + משתקף בזינוק. <b>למה זה חשוב:</b> שלא יקרה שרגע לפני עלייה הלקוח שואל "מה עם זה?" ואף אחד לא מכיר. <b>איך לגשת:</b> ב-13.7 מפרסמים ללקוח את המטריצה המלאה, ממנים אחראי לכל סנריו, ומגדירים "הכרזנו סיימנו" ל-31.8. סנריו שיונתן מכיר לבדו — לתעדף לפני 18.7.</div>
+    <div id="tbl-qa"></div>
+  </section>
+
+  <section id="sec-if">
+    <div class="sec-head"><h2>תחום 3 · ממשקים צד ג'</h2><span class="owner-tag" id="ifOwner">אחראי: ⚠ טרם מונה — פער פתוח</span>
+      <span class="why">קשר יומי עם כל צד ג', כולל "היום לא קרה כלום". שינוי אצלם = בדיקה אצלנו.</span></div>
+    <div class="sec-goal"><b>התוצר:</b> סטטוס יומי פר ממשק + וידוא יזום (פעמיים!) שכל ההכנות בצד שלנו בוצעו — לא מחכים ואז מגלים. <b>דגשים נוספים:</b> סביבות בדיקה זהות לייצור, טיפול בשגיאות ו-fallback כשממשק נופל, בדיקת נפחים/עומסים, אנשי קשר וזמני תגובה מוסכמים מכל ספק, ומעקב שינויי API בצד שלהם. <b>איך לגשת:</b> למנות אחראי אחד (השבוע!), לקבוע ערוץ יומי מול כל צד ג', ולנהל את הטבלה הזו כמקור אמת.</div>
+    <div id="tbl-if"></div>
+  </section>
+
+  <section id="sec-train">
+    <div class="sec-head"><h2>תחום 4 · הדרכות</h2><span class="owner-tag">אחראית: דניס</span>
+      <span class="why">הדרכה בלי דף מסכם לפי תהליך העבודה של הלקוח — לא נספרת כהושלמה.</span></div>
+    <div class="sec-goal"><b>התוצר:</b> לכל הדרכה — סיכום איך היה, דף עזר ללקוח לפי תהליך העבודה שלו (לא גנרי!) שנשלח מיד אחרי, הקלטה, ומנגנון וידוא הבנה (שאלון קצר / תרגול מעשי). <b>למה זה חשוב:</b> הדף הוא מה שיציל את המשתמש ברגע האמת אחרי העלייה לאוויר. <b>איך לגשת:</b> לבנות עכשיו את רשימת כל ההדרכות שנותרו, להכין את דפי העזר מראש, ולסגור את כולן לפני 14.9. סיוון יכולה לעזור בהכנת הדפים.</div>
+    <div id="tbl-train"></div>
+  </section>
+
+  <section id="sec-gov">
+    <div class="sec-head"><h2>תחום 5 · בקרה וקצב</h2><span class="owner-tag">אחראיות: נלי (PM) + סיוון (תפעול)</span>
+      <span class="why">הקצב הוא המנגנון שמונע את ה"בלאגן": כל אחד יודע מתי הוא מדווח ועל מה.</span></div>
+    <div class="sec-goal"><b>המנגנון:</b> ① דיילי 15 דק' (או אסינכרוני) — כל בעל תחום: מה זז, מה תקוע. ② ישיבת בקרה שבועית — מעבר על הדשבורד הזה: חסמים, תאריכים בסיכון, החלטות. ③ דיווח שבועי למנכ"לית — RAG + חסמים להחלטתה בלבד. ④ Go/No-Go ב-15.9 עם קריטריונים שנקבעו מראש (למטה). <b>עיקרון:</b> חסם שלא שוחרר תוך 48 שעות — עולה למנכ"לית אוטומטית.</div>
+    <div id="tbl-gov"></div>
+    <div class="cards2">
+      <div class="rcard blue"><h3>קריטריוני Go/No-Go — 15.9</h3><ul id="gongList"></ul></div>
+      <div class="rcard blue"><h3>תוכנית Hypercare — 30.9 ואילך</h3><ul>
+        <li contenteditable>שבועיים ראשונים: איש צוות זמין ללקוח בזמן אמת בכל שעות הפעילות</li>
+        <li contenteditable>ערוץ תקלות ייעודי + SLA פנימי לתקלה חוסמת: טיפול מיידי</li>
+        <li contenteditable>שיחת סטטוס יומית עם הלקוח בשבוע הראשון</li>
+        <li contenteditable>דפי העזר של דניס זמינים לכל משתמש אצל הלקוח</li></ul></div>
+    </div>
+  </section>
+
+  <section id="sec-risk">
+    <div class="sec-head"><h2>סיכונים מרכזיים</h2>
+      <span class="why">סיכון שהתממש הופך לחסם ועולה לטבלת החסמים למעלה.</span></div>
+    <div id="tbl-risk"></div>
+  </section>
+
+  <section id="sec-all">
+    <div class="sec-head"><h2>כל המשימות — תצוגה מרוכזת</h2>
+      <span class="why">כל המשימות מכל התחומים בטבלה אחת, ממוינות לפי תאריך יעד. עריכה כאן מתעדכנת בתחום המקורי ולהפך.</span></div>
+    <div style="margin:10px 0 8px;display:flex;gap:8px;flex-wrap:wrap" id="allFilters"></div>
+    <div id="tbl-all"></div>
+  </section>
+
+  <footer>נבנה עבור סיוון · אחראית תפעול · משרת את המנכ"לית בתהליך בקרה, מעקב ושחרור חסמים · מקור נתונים: אקסל "סיטונאות מוצר" של נלי (יולי 2026).</footer>
+</main>
+
+<script>
+const STATUSES=["טרם התחיל","בתהליך","חסום","הושלם","בסיכון"];
+const GO_LIVE=new Date(2026,8,30);
+const DEFAULT_DATA={
+decisions:[
+ {t:"מינוי אחראי אחד לממשקי צד ג' (ביפרו, לוגנט, ישראייר, ALP, שוברי סוכן) — מקצה לקצה",w:"קשר יומי עם הספקים לא יקרה בלי בעלים אחד; זה הפער הניהולי הבולט בפרויקט",d:"10.7",dec:"",s:2},
+ {t:"חלון יונתן: אישור תיעדוף מיידי — אילו בדיקות שרק הוא מכיר נסגרות לפני 18.7",w:"נותרו פחות משבועיים; אחרי 18.7 הידע לא זמין עד 1.9 — בדיוק בחודש הבדיקות הכבד",d:"9.7",dec:"",s:2},
+ {t:"אישור תאריכי אבני הדרך (31.7 הקפאת שינויים · 31.8 סיום בדיקות · 15.9 Go/No-Go) מול נלי והצוות",w:"התאריכים בדף הם הצעה; בלי אישורם אין למי ולמה למדוד עמידה ביעדים",d:"13.7",dec:"",s:1}
+],
+blockers:[
+ {t:"ביפרו — בפיתוח אצל מיכאל, אין מועד סיום",o:"טרם מונה",d:"13.7",a:"לקבל ממיכאל תאריך סיום מחייב השבוע; אם אין — הסלמה למנכ\"לית",s:2},
+ {t:"LDS — On Hold, לוגנט משנים את ה-API (בטיפול נחמה)",o:"נחמה",d:"20.7",a:"לקבל מלוגנט לו\"ז ומפרט API חדש; להחליט אם LDS בכלל בסקופ ל-30.9",s:2},
+ {t:"אין אחראי ממשקים צד ג' — פער ניהולי",o:"מנכ\"לית",d:"10.7",a:"למנות אחראי אחד מקצה לקצה לכל הממשקים",s:2},
+ {t:"חלון יונתן נסגר ב-18.7 — מה שרק הוא יודע חייב להיבדק/להיות מתועד עכשיו",o:"ניתי",d:"18.7",a:"רשימת סנריו בבעלות יונתן + העברת ידע מסודרת עד 17.7",s:1}
+],
+milestones:[
+ {d:"13.7",t:"תוכנית מאושרת: כל סנריו וממשק עם אחראי + תאריך יעד; מטריצת בדיקות משוקפת ללקוח",s:1},
+ {d:"18.7",t:"חלון יונתן נוצל: הסנריו שהוקצו לו בדוקים / הועברו מסודר",s:1},
+ {d:"31.7",t:"Code Freeze רך: רשימת שינויים סגורה — נכנס רק \"חובה לעלייה לאוויר\"",s:0},
+ {d:"15.8",t:"כל הממשקים (ביפרו, ישראייר, Price Box, ALP, LDS, שוברי סוכן) עוברים E2E",s:0},
+ {d:"31.8",t:"\"הכרזנו סיימנו\": כל הסנריו בדוקים מקצה לקצה + מצגת ללקוח מה נמצא ותוקן",s:0},
+ {d:"1.9–14.9",t:"יונתן חוזר: רגרסיה מלאה + UAT של הלקוח + השלמת הדרכות",s:0},
+ {d:"15.9",t:"Go/No-Go עם המנכ\"לית והלקוח · הקפאה מלאה",s:0},
+ {d:"16.9–29.9",t:"Dry-run תפעולי על נתוני אמת · היערכות Hypercare",s:0},
+ {d:"30.9",t:"עלייה לאוויר 🚀 כל פעילות הלקוח במערכת החדשה",s:0}
+],
+changes:[
+ {t:"מיפוי כל הפריטים הפתוחים בגרסאות 138–145 מהאקסל של נלי: חובה/לא, סיכון, השפעה על בדיקות",o:"עדי",d:"13.7",m:"חובה",s:1},
+ {t:"שוברי סוכן — השלמת תיקונים (Import Voucher 138–140) ומסירה לבדיקות איסתא",o:"עדי",d:"20.7",m:"חובה",s:1},
+ {t:"Send Later (US 94084) — שינוי פרטי טיסה ושליחה מאוחרת לא עובדים",o:"עדי",d:"31.7",m:"לסווג",s:0},
+ {t:"מנגנון פעולות גורפות בהתחשבנות (שוברים, מיסי נמל, חשבוניות שותף) — סגירת קצוות 141",o:"עדי",d:"31.7",m:"חובה",s:1},
+ {t:"טבלת מיסי נמל — סיכום מול איסתא + דניס (גרסה 140)",o:"עדי",d:"24.7",m:"חובה",s:0},
+ {t:"Update Series — לוגיקת עדכון סדרה (US 111889/110326) כולל בדיקת AVL",o:"עדי",d:"31.7",m:"לסווג",s:0},
+ {t:"הגדרת נוהל: כל שינוי חדש מ-31.7 נכנס רק באישור עדי+תומר+נלי (חריגי חובה בלבד)",o:"עדי",d:"31.7",m:"חובה",s:0}
+],
+gaps:[
+ {t:"flow ביטולים מלא בחבילה: דמי ביטול, סטטוסים, דיווח לספק — כל הווריאציות",o:"עדי",s:0},
+ {t:"תרחישי קצה בהתחשבנות: Split/Refund כפול, מקדמות, שוברים אחרי מועד יציאה",o:"עדי",s:0},
+ {t:"הרשאות משתמשים אצל הלקוח: מי מוחק טיסה, מי מבטל דמי ביטול",o:"עדי",s:0},
+ {t:"ביצועים תחת עומס אמיתי (איטיות Flight Summary כבר עלתה בעבר)",o:"עדי",s:0}
+],
+qa:[
+ {t:"בניית מטריצת סנריו מלאה: טיסות, סדרות, חבילות, התחשבנות, ביטולים, שוברי סוכן, הפצה, דוחות",o:"ניתי",d:"11.7",c:"לשיקוף 13.7",s:1},
+ {t:"שיקוף המטריצה ללקוח + מנגנון קבלת פידבק והוספת הערותיו",o:"נלי",d:"13.7",c:"ממתין",s:0},
+ {t:"סנריו בבעלות יונתן — בדיקה או העברת ידע לפני הטיסה",o:"יונתן",d:"17.7",c:"פנימי",s:1},
+ {t:"E2E טיסות עצמאיות + סדרות (כולל Update Series)",o:"ניתי",d:"8.8",c:"ישוקף",s:0},
+ {t:"E2E התחשבנות: Flight Summary, שוברים, Refund, Split, חשבוניות סוכן",o:"דניס",d:"15.8",c:"ישוקף",s:0},
+ {t:"E2E חבילות: מטריצה, ביטולים, Family Plan, שידור להפצה",o:"ניתי",d:"22.8",c:"ישוקף",s:0},
+ {t:"E2E שוברי סוכן (AVC): קליטה, שגיאות, התראות, ולידציות",o:"דניס",d:"22.8",c:"ישוקף",s:0},
+ {t:"\"הכרזנו סיימנו\" — הצגת כל הסנריו ללקוח: מה נבדק, מה נמצא, מה תוקן",o:"תומר+נלי",d:"31.8",c:"מצגת ללקוח",s:0},
+ {t:"רגרסיה מלאה עם יונתן + ליווי UAT של הלקוח",o:"יונתן+ניתי",d:"12.9",c:"UAT",s:0}
+],
+interfaces:[
+ {n:"ביפרו (Bpro)",st:"בפיתוח (מיכאל) — אין מועד סיום",o:"טרם מונה",d:"15.8",nx:"לקבל תאריך מחייב; קשר יומי; להכין בדיקות מראש",s:2},
+ {n:"ישראייר API",st:"בטיפול גלאור — פגישת הבהרות תרחישים מול איסתא",o:"גלאור",d:"8.8",nx:"לסגור תרחישים; לבדוק מסך בקרה (US 112427)",s:1},
+ {n:"Price Box",st:"פיתוח הסתיים (יעד היה 31.5) — בבדיקות",o:"טרם מונה",d:"1.8",nx:"לוודא שהבדיקות באמת רצות; עדכוני מחירים E2E",s:1},
+ {n:"ALP",st:"גלאור סיימה; איסתא בודקים טיסות וחבילות",o:"גלאור",d:"8.8",nx:"מעקב יומי על בדיקות איסתא; סגירת עדכונים מול ALP",s:1},
+ {n:"LDS (לוגנט)",st:"On Hold — לוגנט משנים API",o:"נחמה",d:"20.7 להחלטה",nx:"לו\"ז מלוגנט או החלטת סקופ: בפנים/בחוץ ל-30.9",s:2},
+ {n:"שוברי סוכן (AVC)",st:"ממתין לתיקונים; אח\"כ איסתא ממשיכים בדיקות",o:"טרם מונה",d:"15.8",nx:"לדחוף תיקונים; לתאם המשך בדיקות איסתא",s:1}
+],
+training:[
+ {t:"מיפוי כל ההדרכות שנותרו + שיבוץ מול הלקוח עד 14.9",o:"דניס",d:"15.7",s:1},
+ {t:"תבנית \"דף עזר ללקוח\" לפי תהליכי העבודה שלו (עם סיוון) — לא גנרי",o:"דניס+סיוון",d:"20.7",s:0},
+ {t:"נוהל: הקלטה לכל הדרכה + שליחת דף עזר באותו יום",o:"דניס",d:"20.7",s:0},
+ {t:"מנגנון וידוא הבנה: שאלון קצר / תרגול מעשי אחרי כל הדרכה",o:"דניס",d:"27.7",s:0},
+ {t:"הדרכות תפעול שוטף: טיסות, סדרות, חבילות",o:"דניס",d:"22.8",s:0},
+ {t:"הדרכות הנה\"ח והתחשבנות (רן ופנינה + דוחות)",o:"דניס",d:"5.9",s:0},
+ {t:"הדרכות רענון + שאלות פתוחות אחרי UAT",o:"דניס",d:"14.9",s:0}
+],
+governance:[
+ {t:"קביעת דיילי 15 דק' + ישיבת בקרה שבועית קבועה ביומנים",o:"נלי",d:"9.7",s:1},
+ {t:"תבנית דיווח שבועי למנכ\"לית: RAG + חסמים להחלטה בלבד",o:"סיוון",d:"11.7",s:1},
+ {t:"אישור קריטריוני Go/No-Go מול המנכ\"לית והלקוח",o:"סיוון",d:"20.7",s:0},
+ {t:"הקמת הפרויקט ב-Asana כמקור אמת אחרי דיוק הדף הזה",o:"סיוון",d:"15.7",s:0},
+ {t:"נוהל הסלמה: חסם שלא שוחרר תוך 48 שעות עולה למנכ\"לית",o:"נלי",d:"11.7",s:0}
+],
+gonogo:[
+ "100% סנריו חובה — בדוקים וסגורים; אפס באגים חוסמים פתוחים",
+ "כל ממשק שבסקופ עבר E2E על סביבה זהה לייצור",
+ "UAT של הלקוח הסתיים והלקוח אישר בכתב",
+ "כל ההדרכות בוצעו + דפי עזר נמסרו",
+ "תוכנית Hypercare מאוישת ומאושרת",
+ "Rollback/המשכיות: ידוע מה עושים אם משהו קריטי נשבר ביום הראשון"
+],
+risks:[
+ {t:"יונתן זמין רק עד 18.7 וחוזר 1.9 — פער ידע בבדיקות בדיוק בחודש הקריטי",m:"תיעדוף מיידי של הסנריו שלו; העברת ידע מתועדת; רגרסיה איתו בספטמבר",o:"ניתי",s:1},
+ {t:"ביפרו ללא מועד סיום — עלול לגלוש לתוך חלון הבדיקות",m:"תאריך מחייב השבוע + נקודת החלטה 20.7 על תוכנית חלופית",o:"טרם מונה",s:2},
+ {t:"אוגוסט: צוות בדיקות מצומצם (בלי יונתן) מול עומס הבדיקות הגדול",m:"לשקול תגבור זמני / גיוס נלי ודניס לבדיקות בפועל",o:"תומר",s:0},
+ {t:"זרם שינויים לא נסגר (גרסאות 140–145 עדיין זזות) — אין Code Freeze",m:"Code Freeze רך 31.7 + ועדת חריגים עדי/תומר/נלי",o:"עדי",s:1},
+ {t:"הלקוח יעלה דרישות חדשות רגע לפני עלייה (\"מה עם זה?\")",m:"שיקוף מטריצת הבדיקות ללקוח ב-13.7 + פידבק חתום",o:"נלי",s:0},
+ {t:"פס הייצור הקמעונאי: תיקוני סיטונאות עלולים לשבור לקוחות קיימים",m:"רגרסיה קמעונאית על כל שינוי רוחבי לפני שחרור",o:"תומר",s:0}
+]};
+
+let D;
+try{D=JSON.parse(localStorage.getItem("issta-dash")||"null")||structuredClone(DEFAULT_DATA)}
+catch(e){D=structuredClone(DEFAULT_DATA)}
+for(const k in DEFAULT_DATA)if(!D[k])D[k]=structuredClone(DEFAULT_DATA[k]);
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function save(){localStorage.setItem("issta-dash",JSON.stringify(D));
+  const t=new Date();$("#lastUpd").textContent=t.toLocaleDateString("he-IL")+" "+t.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
+  refreshKpis();}
+
+function pill(s,key,i){return `<button class="pill st-${s}" data-k="${key}" data-i="${i}" title="לחיצה לבחירת סטטוס">${STATUSES[s]}</button>`}
+function ed(key,i,f,v,hint){return `<span contenteditable data-k="${key}" data-i="${i}" data-f="${f}">${esc(v)}</span>${hint?`<span class="hint">${esc(hint)}</span>`:""}`}
+function dueCls(d){
+  const m=/^(\d{1,2})\.(\d{1,2})/.exec(String(d||""));if(!m)return"";
+  const dt=new Date(2026,+m[2]-1,+m[1]),days=(dt-new Date())/864e5;
+  return days<0?"due-late":days<7?"due-soon":"";}
+
+function table(el,key,cols,rows,newRow){
+  const box=$(el);
+  box.innerHTML=`<div class="twrap"><table><thead><tr>${cols.map(c=>`<th>${c.h}</th>`).join("")}<th></th></tr></thead><tbody>`+
+    rows.map((r,i)=>`<tr>${cols.map(c=>{
+      if(c.f==="s")return `<td>${pill(r.s,key,i)}</td>`;
+      if(c.f==="d")return `<td class="num ${dueCls(r.d)}">${ed(key,i,"d",r.d)}</td>`;
+      return `<td>${ed(key,i,c.f,r[c.f])}</td>`;
+    }).join("")}<td><button class="rowdel" data-k="${key}" data-i="${i}" title="מחיקת שורה">✕</button></td></tr>`).join("")+
+    `</tbody></table></div><button class="addrow" data-k="${key}">+ הוספת שורה</button>`;
+  box.dataset.newrow=JSON.stringify(newRow);
+}
+
+/* aggregated all-tasks view */
+const DOMAINS=[
+ {k:"changes",label:"שינויים",tf:"t",of:"o",df:"d"},
+ {k:"qa",label:"בדיקות",tf:"t",of:"o",df:"d"},
+ {k:"interfaces",label:"ממשקים",tf:"n",of:"o",df:"d"},
+ {k:"training",label:"הדרכות",tf:"t",of:"o",df:"d"},
+ {k:"governance",label:"בקרה",tf:"t",of:"o",df:"d"},
+ {k:"blockers",label:"חסמים",tf:"t",of:"o",df:"d"},
+ {k:"decisions",label:"החלטות",tf:"t",of:"",df:"d"}
+];
+let allFilter="all",openOnly=false;
+function dueKey(d){const m=/^(\d{1,2})\.(\d{1,2})/.exec(String(d||""));return m?(+m[2])*100+(+m[1]):9999;}
+function renderAll(){
+  const rows=[];
+  for(const dom of DOMAINS){
+    if(allFilter!=="all"&&allFilter!==dom.k)continue;
+    D[dom.k].forEach((r,i)=>{
+      if(openOnly&&r.s===3)return;
+      rows.push({dom,i,r});
+    });
+  }
+  rows.sort((a,b)=>dueKey(a.r[a.dom.df])-dueKey(b.r[b.dom.df]));
+  $("#allFilters").innerHTML=
+    `<button class="tbtn ${allFilter==="all"?"primary":""}" data-fl="all">הכל</button>`+
+    DOMAINS.map(d=>`<button class="tbtn ${allFilter===d.k?"primary":""}" data-fl="${d.k}">${d.label}</button>`).join("")+
+    `<button class="tbtn ${openOnly?"primary":""}" data-open="1">רק פתוחות</button>`;
+  $("#tbl-all").innerHTML=`<div class="twrap"><table><thead><tr>
+    <th>תחום</th><th>המשימה</th><th>אחראי</th><th>יעד</th><th>סטטוס</th></tr></thead><tbody>`+
+    rows.map(({dom,i,r})=>`<tr>
+      <td><a href="#sec-${({changes:"chg",qa:"qa",interfaces:"if",training:"train",governance:"gov",blockers:"block",decisions:"dec"})[dom.k]}" style="color:var(--accent);text-decoration:none;font-weight:600">${dom.label}</a></td>
+      <td>${ed(dom.k,i,dom.tf,r[dom.tf])}</td>
+      <td>${dom.of?ed(dom.k,i,dom.of,r[dom.of]):'מנכ"לית'}</td>
+      <td class="num ${dueCls(r[dom.df])}">${ed(dom.k,i,dom.df,r[dom.df])}</td>
+      <td>${pill(r.s,dom.k,i)}</td></tr>`).join("")+
+    `</tbody></table></div>`;
+}
+document.body.addEventListener("click",e=>{
+  const f=e.target.closest("[data-fl]");
+  if(f){allFilter=f.dataset.fl;renderAll();return}
+  const o=e.target.closest("[data-open]");
+  if(o){openOnly=!openOnly;renderAll();}
+});
+
+function render(){
+  table("#tbl-dec","decisions",
+    [{h:"ההחלטה הנדרשת",f:"t"},{h:"למה זה דחוף",f:"w"},{h:"יעד",f:"d"},{h:"ההחלטה שהתקבלה",f:"dec"},{h:"סטטוס",f:"s"}],
+    D.decisions,{t:"החלטה חדשה",w:"",d:"",dec:"",s:2});
+  table("#tbl-block","blockers",
+    [{h:"החסם",f:"t"},{h:"אחראי לשחרור",f:"o"},{h:"יעד",f:"d"},{h:"הפעולה הנדרשת / ההחלטה",f:"a"},{h:"סטטוס",f:"s"}],
+    D.blockers,{t:"חסם חדש",o:"",d:"",a:"",s:2});
+  $("#msGrid").innerHTML=D.milestones.map((m,i)=>
+    `<div class="ms ${m.s===3?"done":""}"><span class="d">${ed("milestones",i,"d",m.d)}</span>
+     <p>${ed("milestones",i,"t",m.t)}</p>${pill(m.s,"milestones",i)}</div>`).join("");
+  table("#tbl-chg","changes",
+    [{h:"השינוי / הפריט",f:"t"},{h:"אחראי",f:"o"},{h:"יעד",f:"d"},{h:"חובה ל-Go-Live?",f:"m"},{h:"סטטוס",f:"s"}],
+    D.changes,{t:"שינוי חדש",o:"עדי",d:"",m:"לסווג",s:0});
+  table("#tbl-gap","gaps",
+    [{h:"פער פוטנציאלי",f:"t"},{h:"אחראי לבירור",f:"o"},{h:"סטטוס",f:"s"}],
+    D.gaps,{t:"פער חדש",o:"עדי",s:0});
+  table("#tbl-qa","qa",
+    [{h:"סנריו / משימת בדיקה",f:"t"},{h:'אחראי ("אבא ואמא")',f:"o"},{h:"יעד",f:"d"},{h:"שיקוף ללקוח",f:"c"},{h:"סטטוס",f:"s"}],
+    D.qa,{t:"סנריו חדש",o:"",d:"",c:"ישוקף",s:0});
+  table("#tbl-if","interfaces",
+    [{h:"ממשק",f:"n"},{h:"מצב נוכחי",f:"st"},{h:"אחראי",f:"o"},{h:"יעד E2E",f:"d"},{h:"הפעולה הבאה",f:"nx"},{h:"סטטוס",f:"s"}],
+    D.interfaces,{n:"ממשק חדש",st:"",o:"",d:"",nx:"",s:0});
+  table("#tbl-train","training",
+    [{h:"משימה",f:"t"},{h:"אחראי",f:"o"},{h:"יעד",f:"d"},{h:"סטטוס",f:"s"}],
+    D.training,{t:"הדרכה חדשה",o:"דניס",d:"",s:0});
+  table("#tbl-gov","governance",
+    [{h:"משימת בקרה",f:"t"},{h:"אחראי",f:"o"},{h:"יעד",f:"d"},{h:"סטטוס",f:"s"}],
+    D.governance,{t:"משימה חדשה",o:"",d:"",s:0});
+  $("#gongList").innerHTML=D.gonogo.map((g,i)=>`<li>${ed("gonogo",i,"",g)}</li>`).join("");
+  table("#tbl-risk","risks",
+    [{h:"הסיכון",f:"t"},{h:"פעולת מנע / מיתון",f:"m"},{h:"אחראי",f:"o"},{h:"סטטוס",f:"s"}],
+    D.risks,{t:"סיכון חדש",m:"",o:"",s:0});
+  renderAll();
+  refreshKpis();
+}
+
+function refreshKpis(){
+  $("#daysLeft").textContent=Math.max(0,Math.ceil((GO_LIVE-new Date())/864e5));
+  const openBlk=D.blockers.filter(b=>b.s!==3).length;
+  $("#blkCnt").textContent=openBlk;
+  const all=[...D.changes,...D.qa,...D.interfaces,...D.training,...D.governance];
+  const done=all.filter(r=>r.s===3).length;
+  $("#taskPct").textContent=all.length?Math.round(done/all.length*100)+"%":"—";
+  const crit=openBlk>=3||[...D.interfaces,...D.risks].some(r=>r.s===2);
+  const warn=openBlk>0||all.some(r=>r.s===2||r.s===4);
+  const rag=crit?["R","אדום — נדרשת התערבות"]:warn?["Y","צהוב — בסיכון מנוהל"]:["G","ירוק — במסלול"];
+  const box=$("#ragBox");box.className="kpi rag rag-"+rag[0];$("#ragTxt").textContent=rag[1];
+}
+
+/* undo */
+const UNDO=[];
+function snapshot(){UNDO.push(JSON.stringify(D));if(UNDO.length>50)UNDO.shift();$("#btnUndo").disabled=false;}
+$("#btnUndo").onclick=()=>{if(!UNDO.length)return;D=JSON.parse(UNDO.pop());$("#btnUndo").disabled=!UNDO.length;save();render();};
+document.addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"&&!e.target.closest("[contenteditable]")){e.preventDefault();$("#btnUndo").click();}});
+
+/* status picker menu */
+const stMenu=document.createElement("div");stMenu.id="stMenu";document.body.appendChild(stMenu);
+let stTarget=null;
+function openStMenu(p){
+  stTarget=p;
+  const cur=D[p.dataset.k][+p.dataset.i].s;
+  stMenu.innerHTML=STATUSES.map((s,idx)=>
+    `<button data-s="${idx}" class="${idx===cur?"cur":""}"><span class="pill st-${idx}">${s}</span></button>`).join("");
+  stMenu.style.display="block";
+  const r=p.getBoundingClientRect();
+  stMenu.style.top=(r.bottom+scrollY+4)+"px";
+  stMenu.style.left=Math.max(8,r.left+scrollX+r.width-stMenu.offsetWidth)+"px";
+}
+function closeStMenu(){stMenu.style.display="none";stTarget=null;}
+stMenu.addEventListener("click",e=>{
+  const b=e.target.closest("button[data-s]");if(!b||!stTarget)return;
+  snapshot();
+  D[stTarget.dataset.k][+stTarget.dataset.i].s=+b.dataset.s;
+  closeStMenu();save();render();
+});
+
+document.body.addEventListener("click",e=>{
+  const p=e.target.closest(".pill[data-k]");
+  if(p){e.stopPropagation();stTarget===p?closeStMenu():openStMenu(p);return}
+  if(!e.target.closest("#stMenu"))closeStMenu();
+  const del=e.target.closest(".rowdel");
+  if(del&&confirm("למחוק את השורה?")){snapshot();D[del.dataset.k].splice(+del.dataset.i,1);save();render();return}
+  const add=e.target.closest(".addrow");
+  if(add){snapshot();D[add.dataset.k].push(JSON.parse(add.parentElement.dataset.newrow));save();render();
+    const rows=add.parentElement.querySelectorAll("tbody tr");
+    rows[rows.length-1]?.querySelector("[contenteditable]")?.focus();}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeStMenu();});
+addEventListener("scroll",closeStMenu,{passive:true});
+document.body.addEventListener("focusout",e=>{
+  const el=e.target.closest("[contenteditable][data-k]");if(!el)return;
+  const{k,i,f}=el.dataset,v=el.textContent.trim();
+  const old=f?D[k][+i][f]:D[k][+i];
+  if(v===String(old??""))return;
+  snapshot();
+  if(f)D[k][+i][f]=v;else D[k][+i]=v;
+  save();
+  if(f==="d")render();
+});
+
+$("#btnReset").onclick=()=>{if(confirm("לאפס את כל הנתונים לתבנית המקורית? עריכות מקומיות יימחקו.")){
+  D=structuredClone(DEFAULT_DATA);save();render();}};
+
+render();save();
+</script>
