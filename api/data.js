@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
   });
 
   if (req.method === "GET") {
-    const r = await gh(API + "?ref=main&_=" + Date.now(), { cache: "no-store" });
+    const r = await gh(API + "?ref=main&_=" + Date.now());
     if (!r.ok) return res.status(502).json({ error: "load failed " + r.status });
     const meta = await r.json();
     res.setHeader("Cache-Control", "no-store");
