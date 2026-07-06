@@ -130,6 +130,10 @@ td .hint{display:block;font-size:12px;color:var(--ink-faint);margin-top:2px}
 .rcard.blue h3{color:var(--accent)}
 .rcard ul{margin:0;padding-inline-start:18px;color:var(--ink-soft);line-height:1.6}
 .rcard li{margin-bottom:5px}
+.rcard ul.checklist{list-style:none;padding-inline-start:0}
+.checklist li{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
+.checklist input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:2px 0 0;flex:0 0 auto;cursor:pointer}
+.checklist li.done span[contenteditable]{color:var(--good);text-decoration:line-through;text-decoration-color:#9fd3ad}
 
 /* all-tasks filters */
 #allFilters .tbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -219,8 +223,8 @@ td .hint{display:block;font-size:12px;color:var(--ink-faint);margin-top:2px}
     <div class="sec-goal"><b>המנגנון:</b> ① דיילי 15 דק' (או אסינכרוני) — כל בעל תחום: מה זז, מה תקוע. ② ישיבת בקרה שבועית — מעבר על הדשבורד הזה: חסמים, תאריכים בסיכון, החלטות. ③ דיווח שבועי למנכ"לית — RAG + חסמים להחלטתה בלבד. ④ Go/No-Go ב-15.9 עם קריטריונים שנקבעו מראש (למטה). <b>עיקרון:</b> חסם שלא שוחרר תוך 48 שעות — עולה למנכ"לית אוטומטית.</div>
     <div id="tbl-gov"></div>
     <div class="cards2">
-      <div class="rcard blue"><h3>קריטריוני Go/No-Go — 15.9</h3><ul id="gongList"></ul></div>
-      <div class="rcard blue"><h3>תוכנית Hypercare — 30.9 ואילך</h3><ul>
+      <div class="rcard blue"><h3>צ'קליסט Go/No-Go — מה חייב להיות ירוק לפני 15.9</h3><ul id="gongList" class="checklist"></ul></div>
+      <div class="rcard blue"><h3>ליווי מוגבר אחרי העלייה (Hypercare) — 30.9 ואילך</h3><ul>
         <li contenteditable>שבועיים ראשונים: איש צוות זמין ללקוח בזמן אמת בכל שעות הפעילות</li>
         <li contenteditable>ערוץ תקלות ייעודי + SLA פנימי לתקלה חוסמת: טיפול מיידי</li>
         <li contenteditable>שיחת סטטוס יומית עם הלקוח בשבוע הראשון</li>
@@ -377,6 +381,9 @@ async function boot(){
   for(const k in D)if(Array.isArray(D[k]))D[k].forEach(r=>{
     if(r&&typeof r.o==="string"&&r.o.includes("+")){const parts=r.o.split("+").map(s=>s.trim());r.o=parts[0];if(!r.h)r.h=parts.slice(1).join(", ");}
     if(r&&["גלאור","סיוון","טרם מונה"].includes(r.o))r.o="יש למנות אחראי";
+  });
+  D.gonogo=D.gonogo.map(g=>typeof g==="string"?{t:g,done:false}:g);
+  for(const k in D)if(Array.isArray(D[k]))D[k].forEach(r=>{
     if(r)for(const f of ["t","n","st","nx","c"])if(typeof r[f]==="string"&&r[f].includes("E2E"))
       r[f]=r[f].replace(/^E2E /,"בדיקה מקצה לקצה — ").replace(/עוברים E2E/,"נבדקו מקצה לקצה").replace(/עבר E2E/,"נבדק מקצה לקצה").replace(/עדכוני מחירים E2E/,"בדיקת עדכוני מחירים מקצה לקצה").replace(/יעד E2E/,"יעד בדיקה").replace(/\bE2E\b/g,"מקצה לקצה");
     if(r&&r.h){const tf=("t"in r)?"t":("n"in r)?"n":null;
@@ -507,7 +514,8 @@ function render(){
   table("#tbl-gov","governance",
     [{h:"משימת בקרה",f:"t"},{h:"אחראי",f:"o"},{h:"יעד",f:"d"},{h:"סטטוס",f:"s"}],
     D.governance,{t:"משימה חדשה",o:"",d:"",s:0});
-  $("#gongList").innerHTML=D.gonogo.map((g,i)=>`<li>${ed("gonogo",i,"",g)}</li>`).join("");
+  $("#gongList").innerHTML=D.gonogo.map((g,i)=>
+    `<li class="${g.done?"done":""}"><input type="checkbox" data-gg="${i}" ${g.done?"checked":""} title="סימון: הקריטריון הושג">${ed("gonogo",i,"t",g.t)}</li>`).join("");
   table("#tbl-risk","risks",
     [{h:"הסיכון",f:"t"},{h:"פעולת מנע / מיתון",f:"m"},{h:"אחראי",f:"o"},{h:"סטטוס",f:"s"}],
     D.risks,{t:"סיכון חדש",m:"",o:"",s:0});
@@ -583,6 +591,10 @@ document.body.addEventListener("click",e=>{
 });
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeStMenu();});
 addEventListener("scroll",closeStMenu,{passive:true});
+document.body.addEventListener("change",e=>{
+  const cb=e.target.closest('input[data-gg]');if(!cb)return;
+  snapshot();D.gonogo[+cb.dataset.gg].done=cb.checked;save();render();
+});
 document.body.addEventListener("focusout",e=>{
   const el=e.target.closest("[contenteditable][data-k]");if(!el)return;
   const{k,i,f}=el.dataset,v=el.textContent.trim();
