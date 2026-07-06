@@ -53,7 +53,8 @@ section{margin-bottom:44px}
 .sec-head{display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:7px;margin-bottom:4px}
 .sec-head h2{font-size:19px;font-weight:700}
 .sec-head .owner-tag{font-size:12.5px;color:var(--accent);background:var(--accent-soft);border-radius:12px;padding:2px 11px;font-weight:600}
-.sec-head .why{font-size:12.5px;color:var(--ink-faint);margin-inline-start:auto;max-width:46ch;text-align:left}
+.sec-head .why{font-size:12.5px;color:var(--ink-faint);margin-inline-start:auto;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+footer{display:none}
 .sec-goal{background:var(--card);border:1px solid var(--line);border-inline-start:4px solid var(--accent);
   border-radius:6px;padding:10px 14px;margin:12px 0 14px;font-size:13.5px;color:var(--ink-soft)}
 .sec-goal b{color:var(--ink)}
@@ -149,29 +150,27 @@ footer{margin-top:50px;font-size:12px;color:var(--ink-faint);border-top:1px soli
     <button class="tbtn" id="btnRefresh" title="טעינת הגרסה המשותפת האחרונה">⟳ רענון</button>
   </div>
 
-  <div class="callout"><b>איך עובדים עם הדף:</b> כל טקסט ניתן לעריכה בלחיצה. לחיצה על תגית סטטוס פותחת תפריט לבחירת סטטוס. טעות? «↩ ביטול פעולה» (או Ctrl+Z). כל שינוי נשמר ומשותף אוטומטית — כל מי שיפתח את הלינק יראה את התמונה המעודכנת.</div>
-
   <section id="sec-dec" class="blockers">
     <div class="sec-head"><h2>שולחן המנכ"לית — החלטות פתוחות</h2>
-      <span class="why">שלוש ההחלטות שרק המנכ"לית יכולה לסגור. החלטה שהתקבלה — לתעד בעמודת ההחלטה ולסמן "הושלם".</span></div>
+      <span class="why">החלטות שרק המנכ"לית יכולה לסגור — לתעד ולסמן «הושלם».</span></div>
     <div id="tbl-dec"></div>
   </section>
 
   <section id="sec-block" class="blockers">
     <div class="sec-head"><h2>חסמים פתוחים — דורשים החלטה / הסלמה</h2>
-      <span class="why">השולחן של המנכ"לית: רק מה שתקוע ודורש התערבות. חסם שנפתר — לסמן "שוחרר".</span></div>
+      <span class="why">רק מה שתקוע ודורש התערבות עכשיו.</span></div>
     <div id="tbl-block"></div>
   </section>
 
   <section id="sec-ms">
     <div class="sec-head"><h2>אבני דרך — תכנון לאחור מ-30.9</h2>
-      <span class="why">כל אבן דרך היא שער: לא עוברים הלאה בלי לסגור אותה או להחליט במודע לדחות.</span></div>
+      <span class="why">לא עוברים הלאה בלי לסגור או להחליט במודע לדחות.</span></div>
     <div class="mstones" id="msGrid"></div>
   </section>
 
   <section id="sec-chg">
     <div class="sec-head"><h2>תחום 1 · שינויים ופערים</h2><span class="owner-tag">אחראי: עדי (מוצר)</span>
-      <span class="why">שרשימת השינויים תפסיק להיות זרם אינסופי ותהפוך לרשימה סגורה ומנוהלת.</span></div>
+      <span class="why">רשימה סגורה ומנוהלת במקום זרם שינויים אינסופי.</span></div>
     <div class="sec-goal"><b>התוצר:</b> טבלת שינויים חיה — לכל שינוי: חובה/לא לעלייה לאוויר, סיכון (מה יכול להישבר), השפעה על flow הבדיקות ואיך בודקים. <b>למה זה חשוב:</b> בלי זה אין Code Freeze ואין דרך לדעת מה מסכן את ה-Go-Live. <b>איך לגשת:</b> לעבור על גרסאות 138–145 באקסל של נלי, לסווג כל פריט פתוח, ולהוסיף מדור "פערים שעוד יכולים לצוץ" — לחשוב על כל פינה קטנה, גם מה שנראה מובן מאליו.</div>
     <div id="tbl-chg"></div>
     <h3 style="font-size:15px;margin:22px 0 8px">פערים פוטנציאליים — "להגדיל ראש" (עדי מוסיף שוטף)</h3>
@@ -180,28 +179,28 @@ footer{margin-top:50px;font-size:12px;color:var(--ink-faint);border-top:1px soli
 
   <section id="sec-qa">
     <div class="sec-head"><h2>תחום 2 · בדיקות — מטריצת סנריו</h2><span class="owner-tag">אחראית: ניתי (QA) · מלווה: תומר (פיתוח)</span>
-      <span class="why">לכל סנריו אחראי אחד מהגילוי ועד התיקון, האימות והשיקוף — שום דבר לא נופל בין הכיסאות.</span></div>
+      <span class="why">לכל סנריו אחראי אחד — מהגילוי ועד התיקון והאימות.</span></div>
     <div class="sec-goal"><b>התוצר:</b> מטריצת סנריו משוקפת ללקוח — הלקוח רואה מה בודקים, נותן פידבק, וההערות שלו נכנסות לטבלה. תאריך יעד = בדוק + מה שהתגלה תוקן + משתקף בזינוק. <b>למה זה חשוב:</b> שלא יקרה שרגע לפני עלייה הלקוח שואל "מה עם זה?" ואף אחד לא מכיר. <b>איך לגשת:</b> ב-13.7 מפרסמים ללקוח את המטריצה המלאה, ממנים אחראי לכל סנריו, ומגדירים "הכרזנו סיימנו" ל-31.8. סנריו שיונתן מכיר לבדו — לתעדף לפני 18.7.</div>
     <div id="tbl-qa"></div>
   </section>
 
   <section id="sec-if">
     <div class="sec-head"><h2>תחום 3 · ממשקים צד ג'</h2><span class="owner-tag" id="ifOwner">אחראי: ⚠ טרם מונה — פער פתוח</span>
-      <span class="why">קשר יומי עם כל צד ג', כולל "היום לא קרה כלום". שינוי אצלם = בדיקה אצלנו.</span></div>
+      <span class="why">קשר יומי עם כל צד ג' — גם אם היום לא קרה כלום.</span></div>
     <div class="sec-goal"><b>התוצר:</b> סטטוס יומי פר ממשק + וידוא יזום (פעמיים!) שכל ההכנות בצד שלנו בוצעו — לא מחכים ואז מגלים. <b>דגשים נוספים:</b> סביבות בדיקה זהות לייצור, טיפול בשגיאות ו-fallback כשממשק נופל, בדיקת נפחים/עומסים, אנשי קשר וזמני תגובה מוסכמים מכל ספק, ומעקב שינויי API בצד שלהם. <b>איך לגשת:</b> למנות אחראי אחד (השבוע!), לקבוע ערוץ יומי מול כל צד ג', ולנהל את הטבלה הזו כמקור אמת.</div>
     <div id="tbl-if"></div>
   </section>
 
   <section id="sec-train">
     <div class="sec-head"><h2>תחום 4 · הדרכות</h2><span class="owner-tag">אחראית: דניס</span>
-      <span class="why">הדרכה בלי דף מסכם לפי תהליך העבודה של הלקוח — לא נספרת כהושלמה.</span></div>
+      <span class="why">הדרכה בלי דף מסכם ללקוח — לא נספרת כהושלמה.</span></div>
     <div class="sec-goal"><b>התוצר:</b> לכל הדרכה — סיכום איך היה, דף עזר ללקוח לפי תהליך העבודה שלו (לא גנרי!) שנשלח מיד אחרי, הקלטה, ומנגנון וידוא הבנה (שאלון קצר / תרגול מעשי). <b>למה זה חשוב:</b> הדף הוא מה שיציל את המשתמש ברגע האמת אחרי העלייה לאוויר. <b>איך לגשת:</b> לבנות עכשיו את רשימת כל ההדרכות שנותרו, להכין את דפי העזר מראש, ולסגור את כולן לפני 14.9. סיוון יכולה לעזור בהכנת הדפים.</div>
     <div id="tbl-train"></div>
   </section>
 
   <section id="sec-gov">
     <div class="sec-head"><h2>תחום 5 · בקרה וקצב</h2><span class="owner-tag">אחראית: נלי (PM) · מלווה: סיוון (תפעול)</span>
-      <span class="why">הקצב הוא המנגנון שמונע את ה"בלאגן": כל אחד יודע מתי הוא מדווח ועל מה.</span></div>
+      <span class="why">קצב קבוע: כל אחד יודע מתי הוא מדווח ועל מה.</span></div>
     <div class="sec-goal"><b>המנגנון:</b> ① דיילי 15 דק' (או אסינכרוני) — כל בעל תחום: מה זז, מה תקוע. ② ישיבת בקרה שבועית — מעבר על הדשבורד הזה: חסמים, תאריכים בסיכון, החלטות. ③ דיווח שבועי למנכ"לית — RAG + חסמים להחלטתה בלבד. ④ Go/No-Go ב-15.9 עם קריטריונים שנקבעו מראש (למטה). <b>עיקרון:</b> חסם שלא שוחרר תוך 48 שעות — עולה למנכ"לית אוטומטית.</div>
     <div id="tbl-gov"></div>
     <div class="cards2">
@@ -216,18 +215,17 @@ footer{margin-top:50px;font-size:12px;color:var(--ink-faint);border-top:1px soli
 
   <section id="sec-risk">
     <div class="sec-head"><h2>סיכונים מרכזיים</h2>
-      <span class="why">סיכון שהתממש הופך לחסם ועולה לטבלת החסמים למעלה.</span></div>
+      <span class="why">סיכון שהתממש הופך לחסם ועולה למעלה.</span></div>
     <div id="tbl-risk"></div>
   </section>
 
   <section id="sec-all">
     <div class="sec-head"><h2>כל המשימות — תצוגה מרוכזת</h2>
-      <span class="why">כל המשימות מכל התחומים בטבלה אחת, ממוינות לפי תאריך יעד. עריכה כאן מתעדכנת בתחום המקורי ולהפך.</span></div>
+      <span class="why">כל המשימות בטבלה אחת, ממוינות לפי תאריך יעד.</span></div>
     <div style="margin:10px 0 8px;display:flex;gap:8px;flex-wrap:wrap" id="allFilters"></div>
     <div id="tbl-all"></div>
   </section>
 
-  <footer>נבנה עבור סיוון · אחראית תפעול · משרת את המנכ"לית בתהליך בקרה, מעקב ושחרור חסמים · מקור נתונים: אקסל "סיטונאות מוצר" של נלי (יולי 2026).</footer>
 </main>
 
 <script>
