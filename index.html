@@ -282,8 +282,8 @@ qa:[
  {t:"E2E התחשבנות: Flight Summary, שוברים, Refund, Split, חשבוניות סוכן",o:"דניס",d:"15.8",c:"ישוקף",s:0},
  {t:"E2E חבילות: מטריצה, ביטולים, Family Plan, שידור להפצה",o:"ניתי",d:"22.8",c:"ישוקף",s:0},
  {t:"E2E שוברי סוכן (AVC): קליטה, שגיאות, התראות, ולידציות",o:"דניס",d:"22.8",c:"ישוקף",s:0},
- {t:"\"הכרזנו סיימנו\" — הצגת כל הסנריו ללקוח: מה נבדק, מה נמצא, מה תוקן",o:"נלי",h:"תומר",d:"31.8",c:"מצגת ללקוח",s:0},
- {t:"רגרסיה מלאה עם יונתן + ליווי UAT של הלקוח",o:"ניתי",h:"יונתן",d:"12.9",c:"UAT",s:0}
+ {t:"\"הכרזנו סיימנו\" — הצגת כל הסנריו ללקוח: מה נבדק, מה נמצא, מה תוקן (בליווי תומר)",o:"נלי",d:"31.8",c:"מצגת ללקוח",s:0},
+ {t:"רגרסיה מלאה + ליווי UAT של הלקוח (בליווי יונתן)",o:"ניתי",d:"12.9",c:"UAT",s:0}
 ],
 interfaces:[
  {n:"ביפרו (Bpro)",st:"בפיתוח (מיכאל) — אין מועד סיום",o:"טרם מונה",d:"15.8",nx:"לקבל תאריך מחייב; קשר יומי; להכין בדיקות מראש",s:2},
@@ -295,7 +295,7 @@ interfaces:[
 ],
 training:[
  {t:"מיפוי כל ההדרכות שנותרו + שיבוץ מול הלקוח עד 14.9",o:"דניס",d:"15.7",s:1},
- {t:"תבנית \"דף עזר ללקוח\" לפי תהליכי העבודה שלו — לא גנרי",o:"דניס",h:"סיוון",d:"20.7",s:0},
+ {t:"תבנית \"דף עזר ללקוח\" לפי תהליכי העבודה שלו — לא גנרי (בליווי סיוון)",o:"דניס",d:"20.7",s:0},
  {t:"נוהל: הקלטה לכל הדרכה + שליחת דף עזר באותו יום",o:"דניס",d:"20.7",s:0},
  {t:"מנגנון וידוא הבנה: שאלון קצר / תרגול מעשי אחרי כל הדרכה",o:"דניס",d:"27.7",s:0},
  {t:"הדרכות תפעול שוטף: טיסות, סדרות, חבילות",o:"דניס",d:"22.8",s:0},
@@ -363,7 +363,10 @@ async function boot(){
   }
   for(const k in DEFAULT_DATA)if(!D[k])D[k]=structuredClone(DEFAULT_DATA[k]);
   for(const k in D)if(Array.isArray(D[k]))D[k].forEach(r=>{
-    if(r&&typeof r.o==="string"&&r.o.includes("+")){const parts=r.o.split("+").map(s=>s.trim());r.o=parts[0];if(!r.h)r.h=parts.slice(1).join(", ");}});
+    if(r&&typeof r.o==="string"&&r.o.includes("+")){const parts=r.o.split("+").map(s=>s.trim());r.o=parts[0];if(!r.h)r.h=parts.slice(1).join(", ");}
+    if(r&&r.h){const tf=("t"in r)?"t":("n"in r)?"n":null;
+      if(tf&&!String(r[tf]).includes("בליווי")&&!String(r[tf]).includes(r.h))r[tf]=r[tf]+" (בליווי "+r.h+")";
+      delete r.h;}});
   render();
   const t=new Date();$("#lastUpd").textContent=t.toLocaleDateString("he-IL")+" "+t.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
 }
@@ -399,8 +402,7 @@ function pill(s,key,i){return `<button class="pill st-${s}" data-k="${key}" data
 function ed(key,i,f,v,hint){return `<span contenteditable data-k="${key}" data-i="${i}" data-f="${f}">${esc(v)}</span>${hint?`<span class="hint">${esc(hint)}</span>`:""}`}
 function ownerCell(key,i,r){
   const o=r.o||"טרם מונה",un=(!r.o||r.o==="טרם מונה")?" unassigned":"";
-  return `<button class="owner-btn${un}" data-ok="${key}" data-i="${i}" title="לחיצה לבחירת אחראי">${esc(o)}</button>
-  <span class="hint">מסייע/ת: <span contenteditable data-k="${key}" data-i="${i}" data-f="h">${esc(r.h||"")}</span></span>`}
+  return `<button class="owner-btn${un}" data-ok="${key}" data-i="${i}" title="לחיצה לבחירת אחראי">${esc(o)}</button>`}
 function dueCls(d){
   const m=/^(\d{1,2})\.(\d{1,2})/.exec(String(d||""));if(!m)return"";
   const dt=new Date(2026,+m[2]-1,+m[1]),days=(dt-new Date())/864e5;
