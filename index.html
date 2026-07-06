@@ -154,7 +154,7 @@ tr.deleted td:not(:last-child){text-decoration:line-through;text-decoration-colo
     <div class="brand">
       <small>Travel Booster · פרויקט אסטרטגי</small>
       <h1>איסתא סיטונאות — חדר בקרה לעלייה לאוויר</h1>
-      <div class="sub">בקרה, מעקב ושחרור חסמים · מוגש למנכ"לית · עדכון אחרון: <span id="lastUpd">—</span></div>
+      <div class="sub">בקרה, מעקב ושחרור חסמים · מוגש לאורלי · עדכון אחרון: <span id="lastUpd">—</span></div>
     </div>
     <div class="kpis">
       <div class="kpi"><b id="daysLeft">—</b><span>ימים ל-30.9</span></div>
@@ -168,7 +168,7 @@ tr.deleted td:not(:last-child){text-decoration:line-through;text-decoration-colo
 <main>
   <div class="toolbar">
     <nav class="jump">
-      <a href="#sec-dec">החלטות מנכ"לית</a><a href="#sec-block">חסמים</a><a href="#sec-ms">אבני דרך</a><a href="#sec-chg">שינויים</a>
+      <a href="#sec-dec">החלטות אורלי</a><a href="#sec-block">חסמים</a><a href="#sec-ms">אבני דרך</a><a href="#sec-chg">שינויים</a>
       <a href="#sec-qa">בדיקות</a><a href="#sec-if">ממשקים</a><a href="#sec-train">הדרכות</a>
       <a href="#sec-gov">בקרה</a><a href="#sec-risk">סיכונים</a><a href="#sec-all">כל המשימות</a><a href="#sec-hist">היסטוריה</a>
     </nav>
@@ -179,8 +179,8 @@ tr.deleted td:not(:last-child){text-decoration:line-through;text-decoration-colo
   </div>
 
   <section id="sec-dec" class="blockers">
-    <div class="sec-head"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 4 5 5-8 5 8 4-5-2 12H5z"/></svg></span><h2>שולחן המנכ"לית — החלטות פתוחות</h2>
-      <span class="why">החלטות שרק המנכ"לית יכולה לסגור — לתעד ולסמן «הושלם».</span></div>
+    <div class="sec-head"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 4 5 5-8 5 8 4-5-2 12H5z"/></svg></span><h2>שולחן אורלי — החלטות פתוחות</h2>
+      <span class="why">החלטות שרק אורלי יכולה לסגור — לתעד ולסמן «הושלם».</span></div>
     <div id="tbl-dec"></div>
   </section>
 
@@ -229,7 +229,7 @@ tr.deleted td:not(:last-child){text-decoration:line-through;text-decoration-colo
   <section id="sec-gov">
     <div class="sec-head"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><h2>תחום 5 · בקרה וקצב</h2><span class="owner-tag">אחראית: נלי (PM) · מלווה: סיוון (תפעול)</span>
       <span class="why">קצב קבוע: כל אחד יודע מתי הוא מדווח ועל מה.</span></div>
-    <div class="sec-goal"><b>המנגנון:</b> ① דיילי 15 דק' (או אסינכרוני) — כל בעל תחום: מה זז, מה תקוע. ② ישיבת בקרה שבועית — מעבר על הדשבורד הזה: חסמים, תאריכים בסיכון, החלטות. ③ דיווח שבועי למנכ"לית — RAG + חסמים להחלטתה בלבד. ④ Go/No-Go ב-15.9 עם קריטריונים שנקבעו מראש (למטה). <b>עיקרון:</b> חסם שלא שוחרר תוך 48 שעות — עולה למנכ"לית אוטומטית.</div>
+    <div class="sec-goal"><b>המנגנון:</b> ① דיילי 15 דק' (או אסינכרוני) — כל בעל תחום: מה זז, מה תקוע. ② ישיבת בקרה שבועית — מעבר על הדשבורד הזה: חסמים, תאריכים בסיכון, החלטות. ③ דיווח שבועי לאורלי — RAG + חסמים להחלטתה בלבד. ④ Go/No-Go ב-15.9 עם קריטריונים שנקבעו מראש (למטה). <b>עיקרון:</b> חסם שלא שוחרר תוך 48 שעות — עולה לאורלי אוטומטית.</div>
     <div id="tbl-gov"></div>
     <div class="cards2">
       <div class="rcard blue"><h3>צ'קליסט Go/No-Go — מה חייב להיות ירוק לפני 15.9</h3><ul id="gongList" class="checklist"></ul></div>
@@ -264,7 +264,7 @@ tr.deleted td:not(:last-child){text-decoration:line-through;text-decoration-colo
 
 <script>
 const STATUSES=["טרם התחיל","בתהליך","חסום","הושלם","בסיכון"];
-const PEOPLE=["נלי","עדי","תומר","ניתי","דניס","יונתן","נחמה",'מנכ"לית',"יש למנות אחראי"];
+const PEOPLE=["נלי","עדי","תומר","ניתי","דניס","יונתן","נחמה",'אורלי',"יש למנות אחראי"];
 const GO_LIVE=new Date(2026,8,30);
 const DEFAULT_DATA={
 history:[],
@@ -274,9 +274,9 @@ decisions:[
  {t:"אישור תאריכי אבני הדרך (31.7 הקפאת שינויים · 31.8 סיום בדיקות · 15.9 Go/No-Go) מול נלי והצוות",w:"התאריכים בדף הם הצעה; בלי אישורם אין למי ולמה למדוד עמידה ביעדים",d:"13.7",dec:"",s:1}
 ],
 blockers:[
- {t:"ביפרו — בפיתוח אצל מיכאל, אין מועד סיום",o:"יש למנות אחראי",d:"13.7",a:"לקבל ממיכאל תאריך סיום מחייב השבוע; אם אין — הסלמה למנכ\"לית",s:2},
+ {t:"ביפרו — בפיתוח אצל מיכאל, אין מועד סיום",o:"יש למנות אחראי",d:"13.7",a:"לקבל ממיכאל תאריך סיום מחייב השבוע; אם אין — הסלמה לאורלי",s:2},
  {t:"LDS — On Hold, לוגנט משנים את ה-API (בטיפול נחמה)",o:"נחמה",d:"20.7",a:"לקבל מלוגנט לו\"ז ומפרט API חדש; להחליט אם LDS בכלל בסקופ ל-30.9",s:2},
- {t:"אין אחראי ממשקים צד ג' — פער ניהולי",o:"מנכ\"לית",d:"10.7",a:"למנות אחראי אחד מקצה לקצה לכל הממשקים",s:2},
+ {t:"אין אחראי ממשקים צד ג' — פער ניהולי",o:"אורלי",d:"10.7",a:"למנות אחראי אחד מקצה לקצה לכל הממשקים",s:2},
  {t:"חלון יונתן נסגר ב-18.7 — מה שרק הוא יודע חייב להיבדק/להיות מתועד עכשיו",o:"ניתי",d:"18.7",a:"רשימת סנריו בבעלות יונתן + העברת ידע מסודרת עד 17.7",s:1}
 ],
 milestones:[
@@ -286,7 +286,7 @@ milestones:[
  {d:"15.8",t:"כל הממשקים (ביפרו, ישראייר, Price Box, ALP, LDS, שוברי סוכן) נבדקו מקצה לקצה",s:0},
  {d:"31.8",t:"\"הכרזנו סיימנו\": כל הסנריו בדוקים מקצה לקצה + מצגת ללקוח מה נמצא ותוקן",s:0},
  {d:"1.9–14.9",t:"יונתן חוזר: רגרסיה מלאה + UAT של הלקוח + השלמת הדרכות",s:0},
- {d:"15.9",t:"Go/No-Go עם המנכ\"לית והלקוח · הקפאה מלאה",s:0},
+ {d:"15.9",t:"Go/No-Go עם אורלי והלקוח · הקפאה מלאה",s:0},
  {d:"16.9–29.9",t:"Dry-run תפעולי על נתוני אמת · היערכות Hypercare",s:0},
  {d:"30.9",t:"עלייה לאוויר 🚀 כל פעילות הלקוח במערכת החדשה",s:0}
 ],
@@ -335,10 +335,10 @@ training:[
 ],
 governance:[
  {t:"קביעת דיילי 15 דק' + ישיבת בקרה שבועית קבועה ביומנים",o:"נלי",d:"9.7",s:1},
- {t:"תבנית דיווח שבועי למנכ\"לית: RAG + חסמים להחלטה בלבד",o:"יש למנות אחראי",d:"11.7",s:1},
- {t:"אישור קריטריוני Go/No-Go מול המנכ\"לית והלקוח",o:"יש למנות אחראי",d:"20.7",s:0},
+ {t:"תבנית דיווח שבועי לאורלי: RAG + חסמים להחלטה בלבד",o:"יש למנות אחראי",d:"11.7",s:1},
+ {t:"אישור קריטריוני Go/No-Go מול אורלי והלקוח",o:"יש למנות אחראי",d:"20.7",s:0},
  {t:"הקמת הפרויקט ב-Asana כמקור אמת אחרי דיוק הדף הזה",o:"יש למנות אחראי",d:"15.7",s:0},
- {t:"נוהל הסלמה: חסם שלא שוחרר תוך 48 שעות עולה למנכ\"לית",o:"נלי",d:"11.7",s:0}
+ {t:"נוהל הסלמה: חסם שלא שוחרר תוך 48 שעות עולה לאורלי",o:"נלי",d:"11.7",s:0}
 ],
 gonogo:[
  "100% סנריו חובה — בדוקים וסגורים; אפס באגים חוסמים פתוחים",
@@ -358,21 +358,24 @@ risks:[
 ]};
 
 /* shared storage: data.json in the GitHub repo is the single source of truth */
+/* shared datastore: data.json in the GitHub repo — one picture for everyone.
+   The save key travels inside the shared link (#k=...) so nobody ever types it. */
 const REPO="sivanAssif/Issta",DATA_API=`https://api.github.com/repos/${REPO}/contents/data.json`;
 let D=structuredClone(DEFAULT_DATA);
-
-/* editor link: #k=<token> stores the save key once and cleans the address bar */
 if(location.hash.startsWith("#k=")){
   localStorage.setItem("gh-token",decodeURIComponent(location.hash.slice(3)));
-  sessionStorage.removeItem("viewOnly");
   history.replaceState(null,"",location.pathname+location.search);
 }
 
-/* identity for the update log */
-function getUser(){
+/* identity for the update log — asked once per browser, on first open */
+function askName(force){
   let u=localStorage.getItem("issta-user");
-  if(!u){u=(prompt("לתיעוד בהיסטוריית העדכונים: מה השם שלך?")||"").trim()||"לא ידוע";localStorage.setItem("issta-user",u);}
-  return u;}
+  if(u)return u;
+  if(!force&&sessionStorage.getItem("nameSkipped")==="1")return null;
+  u=(prompt("שלום! כדי שנדע מי עדכן מה בדף (היסטוריית עדכונים),\nאנא כתבו את שמכם — פעם אחת בלבד בדפדפן זה:")||"").trim();
+  if(u){localStorage.setItem("issta-user",u);return u}
+  sessionStorage.setItem("nameSkipped","1");return null;}
+function getUser(){return askName(true)||"לא ידוע"}
 const KEYLABEL={decisions:"החלטות",blockers:"חסמים",milestones:"אבני דרך",changes:"שינויים",gaps:"פערים",qa:"בדיקות",interfaces:"ממשקים",training:"הדרכות",governance:"בקרה",risks:"סיכונים",gonogo:"Go/No-Go"};
 function rowLabel(key,r){const t=(r&&(r.t||r.n))||"";return (KEYLABEL[key]||key)+(t?": "+String(t).slice(0,45):"")}
 function logAct(a){
@@ -398,12 +401,16 @@ const b64enc=s=>{const u=new TextEncoder().encode(s);let r="";for(let i=0;i<u.le
 const b64dec=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g,"")),c=>c.charCodeAt(0)));
 
 async function loadRemote(){
-  const r=await fetch(DATA_API+"?ref=main&_="+Date.now(),{headers:{Accept:"application/vnd.github+json"},cache:"no-store"});
+  const h={Accept:"application/vnd.github+json"};
+  const tok=localStorage.getItem("gh-token");
+  if(tok)h.Authorization="Bearer "+tok;
+  const r=await fetch(DATA_API+"?ref=main&_="+Date.now(),{headers:h,cache:"no-store"});
   if(!r.ok)throw new Error("HTTP "+r.status);
   const meta=await r.json();
   return {data:JSON.parse(b64dec(meta.content)),sha:meta.sha};
 }
 async function boot(){
+  askName(false);
   const draft=localStorage.getItem("issta-dash");
   try{
     const{data}=await loadRemote();
@@ -413,11 +420,21 @@ async function boot(){
     if(draft){try{D=JSON.parse(draft)}catch(_){}}
     syncNote("מצב לא מקוון — מוצגת הגרסה המקומית");
   }
+  migrate();
+  render();
+  const t=new Date();$("#lastUpd").textContent=t.toLocaleDateString("he-IL")+" "+t.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
+}
+function migrate(){
   for(const k in DEFAULT_DATA)if(!D[k])D[k]=structuredClone(DEFAULT_DATA[k]);
-  for(const k in D)if(Array.isArray(D[k]))D[k]=D[k].map(x=>typeof x==="string"?x.replace(/עבר E2E/,"נבדק מקצה לקצה").replace(/\bE2E\b/g,"מקצה לקצה"):x);
+  const fixOrly=s=>s.split('המנכ"לית').join("אורלי").split('מנכ"לית').join("אורלי");
+  for(const k in D)if(Array.isArray(D[k]))D[k]=D[k].map(x=>typeof x==="string"?fixOrly(x.replace(/עבר E2E/,"נבדק מקצה לקצה").replace(/\bE2E\b/g,"מקצה לקצה")):x);
+  for(const k in D)if(Array.isArray(D[k]))D[k].forEach(r=>{
+    if(r&&typeof r==="object")for(const f in r)if(typeof r[f]==="string"&&r[f].includes('מנכ"לית'))r[f]=fixOrly(r[f]);
+  });
   for(const k in D)if(Array.isArray(D[k]))D[k].forEach(r=>{
     if(r&&typeof r.o==="string"&&r.o.includes("+")){const parts=r.o.split("+").map(s=>s.trim());r.o=parts[0];if(!r.h)r.h=parts.slice(1).join(", ");}
     if(r&&["גלאור","סיוון","טרם מונה"].includes(r.o))r.o="יש למנות אחראי";
+    if(r&&r.o==='מנכ"לית')r.o="אורלי";
   });
   D.gonogo=D.gonogo.map(g=>typeof g==="string"?{t:g,done:false}:g);
   for(const k in D)if(Array.isArray(D[k]))D[k].forEach(r=>{
@@ -426,36 +443,41 @@ async function boot(){
     if(r&&r.h){const tf=("t"in r)?"t":("n"in r)?"n":null;
       if(tf&&!String(r[tf]).includes("בליווי")&&!String(r[tf]).includes(r.h))r[tf]=r[tf]+" (בליווי "+r.h+")";
       delete r.h;}});
-  render();
-  const t=new Date();$("#lastUpd").textContent=t.toLocaleDateString("he-IL")+" "+t.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
 }
 let publishing=false;
 async function publish(){
   if(publishing){clearTimeout(pubTimer);pubTimer=setTimeout(publish,2000);return}
-  let tok=localStorage.getItem("gh-token");
-  if(!tok){
-    if(sessionStorage.getItem("viewOnly")==="1"){syncNote("צפייה בלבד — השינויים נשמרים רק אצלך","var(--warn)");return}
-    tok=prompt("פעם ראשונה בלבד: הדביקי כאן את מפתח השמירה (GitHub Token) כדי שהעדכונים ישותפו לכולם.\nהמפתח נשמר בדפדפן שלך בלבד. ביטול = מצב צפייה בלבד.");
-    if(!tok){sessionStorage.setItem("viewOnly","1");syncNote("צפייה בלבד — השינויים נשמרים רק אצלך","var(--warn)");return}
-    localStorage.setItem("gh-token",tok.trim());
-  }
+  const tok=localStorage.getItem("gh-token");
+  if(!tok){syncNote("נפתח בלינק ישן — בקשו מסיוון את לינק העבודה המשותף","var(--warn)");publishing=false;return}
   publishing=true;syncNote("שומר ומשתף…","");
   try{
     let sha;try{sha=(await loadRemote()).sha}catch(_){}
-    const body={message:"עדכון דשבורד — "+new Date().toLocaleString("he-IL"),content:b64enc(JSON.stringify(D,null,1)),branch:"main"};
+    const body={message:"עדכון: "+getUser()+" — "+new Date().toLocaleString("he-IL"),content:b64enc(JSON.stringify(D,null,1)),branch:"main"};
     if(sha)body.sha=sha;
     const r=await fetch(DATA_API,{method:"PUT",
-      headers:{Authorization:"Bearer "+localStorage.getItem("gh-token"),Accept:"application/vnd.github+json"},
+      headers:{Authorization:"Bearer "+tok,Accept:"application/vnd.github+json"},
       body:JSON.stringify(body)});
-    if(r.status===401){localStorage.removeItem("gh-token");syncNote("מפתח השמירה לא תקין — בשינוי הבא תתבקשי מפתח חדש","var(--crit)");}
-    else if(r.status===409||r.status===422){clearTimeout(pubTimer);pubTimer=setTimeout(publish,1500);}
-    else if(!r.ok)syncNote("השמירה נכשלה ("+r.status+") — ינוסה שוב בשינוי הבא","var(--crit)");
+    if(r.status===409||r.status===422){clearTimeout(pubTimer);pubTimer=setTimeout(publish,8000);}
+    else if(!r.ok)syncNote("השמירה נכשלה ("+r.status+") — ינוסה שוב אוטומטית","var(--crit)");
     else{localStorage.setItem("issta-dirty","0");syncNote();}
-  }catch(e){syncNote("אין חיבור — השינויים שמורים אצלך וינוסו שוב","var(--warn)");
+    if(r.status===401||r.status===403){syncNote("לינק העבודה התחדש — בקשו מסיוון את הלינק העדכני","var(--crit)");}
+  }catch(e){syncNote("אין אינטרנט כרגע — השינויים שמורים וינוסו שוב אוטומטית","var(--warn)");
     clearTimeout(pubTimer);pubTimer=setTimeout(publish,15000);}
   publishing=false;
 }
-addEventListener("beforeunload",e=>{if(isDirty()&&localStorage.getItem("gh-token")){e.preventDefault();e.returnValue="";}});
+addEventListener("beforeunload",e=>{if(isDirty()){e.preventDefault();e.returnValue="";}});
+
+/* live refresh: pull others' updates when this page is idle */
+setInterval(async()=>{
+  if(publishing||isDirty())return;
+  const ae=document.activeElement;
+  if(ae&&ae.closest&&ae.closest("[contenteditable]"))return;
+  if(stMenu.style.display==="block")return;
+  try{
+    const{data}=await loadRemote();
+    if(JSON.stringify(data)!==JSON.stringify(D)){D=data;migrate();render();syncNote();}
+  }catch(_){}
+},45000);
 
 function pill(s,key,i){return `<button class="pill st-${s}" data-k="${key}" data-i="${i}" title="לחיצה לבחירת סטטוס"><span class="dot"></span><span>${STATUSES[s]}</span><span class="caret">▾</span></button>`}
 function ed(key,i,f,v,hint){return `<span contenteditable data-k="${key}" data-i="${i}" data-f="${f}">${esc(v)}</span>${hint?`<span class="hint">${esc(hint)}</span>`:""}`}
@@ -515,7 +537,7 @@ function renderAll(){
     rows.map(({dom,i,r})=>`<tr class="${r.del?"deleted":""}">
       <td><a href="#sec-${({changes:"chg",qa:"qa",interfaces:"if",training:"train",governance:"gov",blockers:"block",decisions:"dec"})[dom.k]}" style="color:var(--accent);text-decoration:none;font-weight:600">${dom.label}</a></td>
       <td>${ed(dom.k,i,dom.tf,r[dom.tf])}</td>
-      <td>${dom.of?ownerCell(dom.k,i,r):'מנכ"לית'}</td>
+      <td>${dom.of?ownerCell(dom.k,i,r):'אורלי'}</td>
       <td class="num ${dueCls(r[dom.df])}">${ed(dom.k,i,dom.df,r[dom.df])}</td>
       <td>${pill(r.s,dom.k,i)}</td></tr>`).join("")+
     `</tbody></table></div>`;
