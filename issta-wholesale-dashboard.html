@@ -142,10 +142,9 @@ footer{margin-top:50px;font-size:12px;color:var(--ink-faint);border-top:1px soli
     <span id="saveNote">טוען נתונים…</span>
     <button class="tbtn" id="btnUndo" disabled title="ביטול השינוי האחרון (Ctrl+Z)">↩ ביטול פעולה</button>
     <button class="tbtn" id="btnRefresh" title="טעינת הגרסה המשותפת האחרונה">⟳ רענון</button>
-    <button class="tbtn primary" id="btnPublish">💾 שמירה ושיתוף לכולם</button>
   </div>
 
-  <div class="callout"><b>איך עובדים עם הדף:</b> כל טקסט ניתן לעריכה בלחיצה. לחיצה על תגית סטטוס פותחת תפריט לבחירת סטטוס. טעות? «↩ ביטול פעולה» (או Ctrl+Z). בסיום העדכונים — «💾 שמירה ושיתוף לכולם»: כל מי שיפתח את הלינק יראה את התמונה המעודכנת.</div>
+  <div class="callout"><b>איך עובדים עם הדף:</b> כל טקסט ניתן לעריכה בלחיצה. לחיצה על תגית סטטוס פותחת תפריט לבחירת סטטוס. טעות? «↩ ביטול פעולה» (או Ctrl+Z). כל שינוי נשמר ומשותף אוטומטית — כל מי שיפתח את הלינק יראה את התמונה המעודכנת.</div>
 
   <section id="sec-dec" class="blockers">
     <div class="sec-head"><h2>שולחן המנכ"לית — החלטות פתוחות</h2>
@@ -326,12 +325,14 @@ let D=structuredClone(DEFAULT_DATA);
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const isDirty=()=>localStorage.getItem("issta-dirty")==="1";
-function syncNote(msg){
-  $("#saveNote").textContent=msg??(isDirty()?"⚠ יש שינויים שטרם שותפו — לחצי «שמירה ושיתוף»":"✓ מסונכרן — כולם רואים גרסה זו");
-  $("#saveNote").style.color=msg?"":(isDirty()?"var(--warn)":"var(--good)");}
+function syncNote(msg,color){
+  $("#saveNote").textContent=msg??(isDirty()?"⚠ שינויים ממתינים לשמירה…":"✓ נשמר ומשותף — כולם רואים גרסה זו");
+  $("#saveNote").style.color=color??(msg?"":(isDirty()?"var(--warn)":"var(--good)"));}
+let pubTimer=null;
 function save(){localStorage.setItem("issta-dash",JSON.stringify(D));localStorage.setItem("issta-dirty","1");
   const t=new Date();$("#lastUpd").textContent=t.toLocaleDateString("he-IL")+" "+t.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
-  syncNote();refreshKpis();}
+  syncNote();refreshKpis();
+  clearTimeout(pubTimer);pubTimer=setTimeout(publish,2500);}
 
 const b64enc=s=>{const u=new TextEncoder().encode(s);let r="";for(let i=0;i<u.length;i+=8192)r+=String.fromCharCode(...u.subarray(i,i+8192));return btoa(r)};
 const b64dec=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g,"")),c=>c.charCodeAt(0)));
@@ -356,13 +357,17 @@ async function boot(){
   render();
   const t=new Date();$("#lastUpd").textContent=t.toLocaleDateString("he-IL")+" "+t.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"});
 }
+let publishing=false;
 async function publish(){
+  if(publishing){clearTimeout(pubTimer);pubTimer=setTimeout(publish,2000);return}
   let tok=localStorage.getItem("gh-token");
   if(!tok){
-    tok=prompt("פעם ראשונה בלבד: הדביקי כאן את מפתח השמירה (GitHub Token).\nהמפתח נשמר בדפדפן שלך בלבד ולא נשלח לאף אחד מלבד GitHub.");
-    if(!tok)return;tok=tok.trim();localStorage.setItem("gh-token",tok);
+    if(sessionStorage.getItem("viewOnly")==="1"){syncNote("צפייה בלבד — השינויים נשמרים רק אצלך","var(--warn)");return}
+    tok=prompt("פעם ראשונה בלבד: הדביקי כאן את מפתח השמירה (GitHub Token) כדי שהעדכונים ישותפו לכולם.\nהמפתח נשמר בדפדפן שלך בלבד. ביטול = מצב צפייה בלבד.");
+    if(!tok){sessionStorage.setItem("viewOnly","1");syncNote("צפייה בלבד — השינויים נשמרים רק אצלך","var(--warn)");return}
+    localStorage.setItem("gh-token",tok.trim());
   }
-  const btn=$("#btnPublish");btn.disabled=true;btn.textContent="משתף…";
+  publishing=true;syncNote("שומר ומשתף…","");
   try{
     let sha;try{sha=(await loadRemote()).sha}catch(_){}
     const body={message:"עדכון דשבורד — "+new Date().toLocaleString("he-IL"),content:b64enc(JSON.stringify(D,null,1)),branch:"main"};
@@ -370,12 +375,15 @@ async function publish(){
     const r=await fetch(DATA_API,{method:"PUT",
       headers:{Authorization:"Bearer "+localStorage.getItem("gh-token"),Accept:"application/vnd.github+json"},
       body:JSON.stringify(body)});
-    if(r.status===401||r.status===403){localStorage.removeItem("gh-token");alert("מפתח השמירה לא תקין או שפג תוקפו. לחצי שוב על הכפתור והדביקי מפתח חדש.");}
-    else if(!r.ok)alert("השמירה נכשלה (שגיאה "+r.status+"). נסי שוב.");
+    if(r.status===401){localStorage.removeItem("gh-token");syncNote("מפתח השמירה לא תקין — בשינוי הבא תתבקשי מפתח חדש","var(--crit)");}
+    else if(r.status===409||r.status===422){clearTimeout(pubTimer);pubTimer=setTimeout(publish,1500);}
+    else if(!r.ok)syncNote("השמירה נכשלה ("+r.status+") — ינוסה שוב בשינוי הבא","var(--crit)");
     else{localStorage.setItem("issta-dirty","0");syncNote();}
-  }catch(e){alert("אין חיבור לאינטרנט או שהשמירה נכשלה. הנתונים שמורים אצלך — נסי שוב מאוחר יותר.");}
-  btn.disabled=false;btn.textContent="💾 שמירה ושיתוף לכולם";
+  }catch(e){syncNote("אין חיבור — השינויים שמורים אצלך וינוסו שוב","var(--warn)");
+    clearTimeout(pubTimer);pubTimer=setTimeout(publish,15000);}
+  publishing=false;
 }
+addEventListener("beforeunload",e=>{if(isDirty()&&localStorage.getItem("gh-token")){e.preventDefault();e.returnValue="";}});
 
 function pill(s,key,i){return `<button class="pill st-${s}" data-k="${key}" data-i="${i}" title="לחיצה לבחירת סטטוס">${STATUSES[s]}</button>`}
 function ed(key,i,f,v,hint){return `<span contenteditable data-k="${key}" data-i="${i}" data-f="${f}">${esc(v)}</span>${hint?`<span class="hint">${esc(hint)}</span>`:""}`}
@@ -540,7 +548,6 @@ document.body.addEventListener("focusout",e=>{
   if(f==="d")render();
 });
 
-$("#btnPublish").onclick=publish;
 $("#btnRefresh").onclick=async()=>{
   if(isDirty()&&!confirm("יש לך שינויים שטרם שותפו — רענון יחליף אותם בגרסה המשותפת האחרונה. להמשיך?"))return;
   localStorage.setItem("issta-dirty","0");localStorage.removeItem("issta-dash");
