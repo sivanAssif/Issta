@@ -45,7 +45,7 @@ module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-User");
   if (req.method === "OPTIONS") return res.status(204).end();
 
-  const tok = (process.env.GH_TOKEN || "").replace(/\s+/g, "");
+  const tok = (process.env.GH_TOKEN || "").replace(/[^A-Za-z0-9_]/g, "");
   if (!tok) return res.status(500).json({ error: "GH_TOKEN not configured" });
 
   try {
