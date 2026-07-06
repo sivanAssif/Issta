@@ -134,6 +134,15 @@ td .hint{display:block;font-size:12px;color:var(--ink-faint);margin-top:2px}
 .checklist li{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
 .checklist input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;margin:2px 0 0;flex:0 0 auto;cursor:pointer}
 .checklist li.done span[contenteditable]{color:var(--good);text-decoration:line-through;text-decoration-color:#9fd3ad}
+tr.deleted{opacity:.55}
+tr.deleted td:not(:last-child){text-decoration:line-through;text-decoration-color:var(--crit)}
+.rowdel.restore{color:var(--good);font-size:13px}
+.rowdel.restore:hover{color:var(--good)}
+#histWrap{max-height:360px;overflow-y:auto}
+#histWrap table{min-width:520px}
+#histWrap td{font-size:12.5px}
+#histWrap td.who{font-weight:600;color:var(--accent-deep);white-space:nowrap}
+#histWrap td.when{color:var(--ink-faint);white-space:nowrap;font-variant-numeric:tabular-nums}
 
 /* all-tasks filters */
 #allFilters .tbtn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -161,7 +170,7 @@ td .hint{display:block;font-size:12px;color:var(--ink-faint);margin-top:2px}
     <nav class="jump">
       <a href="#sec-dec">החלטות מנכ"לית</a><a href="#sec-block">חסמים</a><a href="#sec-ms">אבני דרך</a><a href="#sec-chg">שינויים</a>
       <a href="#sec-qa">בדיקות</a><a href="#sec-if">ממשקים</a><a href="#sec-train">הדרכות</a>
-      <a href="#sec-gov">בקרה</a><a href="#sec-risk">סיכונים</a><a href="#sec-all">כל המשימות</a>
+      <a href="#sec-gov">בקרה</a><a href="#sec-risk">סיכונים</a><a href="#sec-all">כל המשימות</a><a href="#sec-hist">היסטוריה</a>
     </nav>
     <div class="spacer"></div>
     <span id="saveNote">טוען נתונים…</span>
@@ -245,6 +254,12 @@ td .hint{display:block;font-size:12px;color:var(--ink-faint);margin-top:2px}
     <div id="tbl-all"></div>
   </section>
 
+  <section id="sec-hist">
+    <div class="sec-head"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span><h2>היסטוריית עדכונים</h2>
+      <span class="why">מי עדכן מה ומתי — נרשם אוטומטית.</span></div>
+    <div class="twrap" id="histWrap"></div>
+  </section>
+
 </main>
 
 <script>
@@ -252,6 +267,7 @@ const STATUSES=["טרם התחיל","בתהליך","חסום","הושלם","בס
 const PEOPLE=["נלי","עדי","תומר","ניתי","דניס","יונתן","נחמה",'מנכ"לית',"יש למנות אחראי"];
 const GO_LIVE=new Date(2026,8,30);
 const DEFAULT_DATA={
+history:[],
 decisions:[
  {t:"מינוי אחראי אחד לממשקי צד ג' (ביפרו, לוגנט, ישראייר, ALP, שוברי סוכן) — מקצה לקצה",w:"קשר יומי עם הספקים לא יקרה בלי בעלים אחד; זה הפער הניהולי הבולט בפרויקט",d:"10.7",dec:"",s:2},
  {t:"חלון יונתן: אישור תיעדוף מיידי — אילו בדיקות שרק הוא מכיר נסגרות לפני 18.7",w:"נותרו פחות משבועיים; אחרי 18.7 הידע לא זמין עד 1.9 — בדיוק בחודש הבדיקות הכבד",d:"9.7",dec:"",s:2},
@@ -345,6 +361,27 @@ risks:[
 const REPO="sivanAssif/Issta",DATA_API=`https://api.github.com/repos/${REPO}/contents/data.json`;
 let D=structuredClone(DEFAULT_DATA);
 
+/* editor link: #k=<token> stores the save key once and cleans the address bar */
+if(location.hash.startsWith("#k=")){
+  localStorage.setItem("gh-token",decodeURIComponent(location.hash.slice(3)));
+  sessionStorage.removeItem("viewOnly");
+  history.replaceState(null,"",location.pathname+location.search);
+}
+
+/* identity for the update log */
+function getUser(){
+  let u=localStorage.getItem("issta-user");
+  if(!u){u=(prompt("לתיעוד בהיסטוריית העדכונים: מה השם שלך?")||"").trim()||"לא ידוע";localStorage.setItem("issta-user",u);}
+  return u;}
+const KEYLABEL={decisions:"החלטות",blockers:"חסמים",milestones:"אבני דרך",changes:"שינויים",gaps:"פערים",qa:"בדיקות",interfaces:"ממשקים",training:"הדרכות",governance:"בקרה",risks:"סיכונים",gonogo:"Go/No-Go"};
+function rowLabel(key,r){const t=(r&&(r.t||r.n))||"";return (KEYLABEL[key]||key)+(t?": "+String(t).slice(0,45):"")}
+function logAct(a){
+  if(!Array.isArray(D.history))D.history=[];
+  const now=new Date();
+  D.history.unshift({ts:now.toLocaleDateString("he-IL")+" "+now.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit"}),u:getUser(),a:a});
+  if(D.history.length>400)D.history.length=400;
+}
+
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const isDirty=()=>localStorage.getItem("issta-dirty")==="1";
@@ -433,12 +470,14 @@ function dueCls(d){
 function table(el,key,cols,rows,newRow){
   const box=$(el);
   box.innerHTML=`<div class="twrap"><table><thead><tr>${cols.map(c=>`<th>${c.h}</th>`).join("")}<th></th></tr></thead><tbody>`+
-    rows.map((r,i)=>`<tr>${cols.map(c=>{
+    rows.map((r,i)=>`<tr class="${r.del?"deleted":""}">${cols.map(c=>{
       if(c.f==="s")return `<td>${pill(r.s,key,i)}</td>`;
       if(c.f==="d")return `<td class="num ${dueCls(r.d)}">${ed(key,i,"d",r.d)}</td>`;
       if(c.f==="o")return `<td>${ownerCell(key,i,r)}</td>`;
       return `<td>${ed(key,i,c.f,r[c.f])}</td>`;
-    }).join("")}<td><button class="rowdel" data-k="${key}" data-i="${i}" title="מחיקת שורה">✕</button></td></tr>`).join("")+
+    }).join("")}<td>${r.del
+      ?`<button class="rowdel restore" data-k="${key}" data-i="${i}" title="שחזור השורה">↩</button>`
+      :`<button class="rowdel" data-k="${key}" data-i="${i}" title="ביטול שורה — נשארת בתצוגה עם קו לתיעוד">✕</button>`}</td></tr>`).join("")+
     `</tbody></table></div><button class="addrow" data-k="${key}">+ הוספת שורה</button>`;
   box.dataset.newrow=JSON.stringify(newRow);
 }
@@ -453,14 +492,15 @@ const DOMAINS=[
  {k:"blockers",label:"חסמים",tf:"t",of:"o",df:"d"},
  {k:"decisions",label:"החלטות",tf:"t",of:"",df:"d"}
 ];
-let allFilter="all",openOnly=false;
+let allFilter="all",openOnly=false,delOnly=false;
 function dueKey(d){const m=/^(\d{1,2})\.(\d{1,2})/.exec(String(d||""));return m?(+m[2])*100+(+m[1]):9999;}
 function renderAll(){
   const rows=[];
   for(const dom of DOMAINS){
     if(allFilter!=="all"&&allFilter!==dom.k)continue;
     D[dom.k].forEach((r,i)=>{
-      if(openOnly&&r.s===3)return;
+      if(delOnly&&!r.del)return;
+      if(!delOnly&&openOnly&&(r.s===3||r.del))return;
       rows.push({dom,i,r});
     });
   }
@@ -468,10 +508,11 @@ function renderAll(){
   $("#allFilters").innerHTML=
     `<button class="tbtn ${allFilter==="all"?"primary":""}" data-fl="all">הכל</button>`+
     DOMAINS.map(d=>`<button class="tbtn ${allFilter===d.k?"primary":""}" data-fl="${d.k}">${d.label}</button>`).join("")+
-    `<button class="tbtn ${openOnly?"primary":""}" data-open="1">רק פתוחות</button>`;
+    `<button class="tbtn ${openOnly?"primary":""}" data-open="1">רק פתוחות</button>`+
+    `<button class="tbtn ${delOnly?"primary":""}" data-del="1">שורות שבוטלו</button>`;
   $("#tbl-all").innerHTML=`<div class="twrap"><table><thead><tr>
     <th>תחום</th><th>המשימה</th><th>אחראי</th><th>יעד</th><th>סטטוס</th></tr></thead><tbody>`+
-    rows.map(({dom,i,r})=>`<tr>
+    rows.map(({dom,i,r})=>`<tr class="${r.del?"deleted":""}">
       <td><a href="#sec-${({changes:"chg",qa:"qa",interfaces:"if",training:"train",governance:"gov",blockers:"block",decisions:"dec"})[dom.k]}" style="color:var(--accent);text-decoration:none;font-weight:600">${dom.label}</a></td>
       <td>${ed(dom.k,i,dom.tf,r[dom.tf])}</td>
       <td>${dom.of?ownerCell(dom.k,i,r):'מנכ"לית'}</td>
@@ -483,7 +524,9 @@ document.body.addEventListener("click",e=>{
   const f=e.target.closest("[data-fl]");
   if(f){allFilter=f.dataset.fl;renderAll();return}
   const o=e.target.closest("[data-open]");
-  if(o){openOnly=!openOnly;renderAll();}
+  if(o){openOnly=!openOnly;if(openOnly)delOnly=false;renderAll();return}
+  const dl=e.target.closest("[data-del]");
+  if(dl){delOnly=!delOnly;if(delOnly)openOnly=false;renderAll();}
 });
 
 function render(){
@@ -520,17 +563,26 @@ function render(){
     [{h:"הסיכון",f:"t"},{h:"פעולת מנע / מיתון",f:"m"},{h:"אחראי",f:"o"},{h:"סטטוס",f:"s"}],
     D.risks,{t:"סיכון חדש",m:"",o:"",s:0});
   renderAll();
+  renderHist();
   refreshKpis();
+}
+function renderHist(){
+  const h=Array.isArray(D.history)?D.history:[];
+  $("#histWrap").innerHTML=h.length
+    ?`<table><thead><tr><th>מתי</th><th>מי</th><th>מה עודכן</th></tr></thead><tbody>`+
+      h.map(e=>`<tr><td class="when">${esc(e.ts)}</td><td class="who">${esc(e.u)}</td><td>${esc(e.a)}</td></tr>`).join("")+
+      `</tbody></table>`
+    :`<div style="padding:16px;color:var(--ink-faint);font-size:13px">עדיין אין עדכונים מתועדים — כל שינוי מהרגע הזה יירשם כאן אוטומטית.</div>`;
 }
 
 function refreshKpis(){
   $("#daysLeft").textContent=Math.max(0,Math.ceil((GO_LIVE-new Date())/864e5));
-  const openBlk=D.blockers.filter(b=>b.s!==3).length;
+  const openBlk=D.blockers.filter(b=>!b.del&&b.s!==3).length;
   $("#blkCnt").textContent=openBlk;
-  const all=[...D.changes,...D.qa,...D.interfaces,...D.training,...D.governance];
+  const all=[...D.changes,...D.qa,...D.interfaces,...D.training,...D.governance].filter(r=>!r.del);
   const done=all.filter(r=>r.s===3).length;
   $("#taskPct").textContent=all.length?Math.round(done/all.length*100)+"%":"—";
-  const crit=openBlk>=3||[...D.interfaces,...D.risks].some(r=>r.s===2);
+  const crit=openBlk>=3||[...D.interfaces,...D.risks].some(r=>!r.del&&r.s===2);
   const warn=openBlk>0||all.some(r=>r.s===2||r.s===4);
   const rag=crit?["R","אדום — נדרשת התערבות"]:warn?["Y","צהוב — בסיכון מנוהל"]:["G","ירוק — במסלול"];
   const box=$("#ragBox");box.className="kpi rag rag-"+rag[0];$("#ragTxt").textContent=rag[1];
@@ -567,12 +619,16 @@ stMenu.addEventListener("click",e=>{
   if(!stTarget)return;
   const key=stTarget.dataset.k||stTarget.dataset.ok,i=+stTarget.dataset.i;
   const bs=e.target.closest("button[data-s]");
-  if(bs){snapshot();D[key][i].s=+bs.dataset.s;closeStMenu();save();render();return}
+  if(bs){snapshot();D[key][i].s=+bs.dataset.s;
+    logAct('סטטוס עודכן ל"'+STATUSES[+bs.dataset.s]+'" — '+rowLabel(key,D[key][i]));
+    closeStMenu();save();render();return}
   const bv=e.target.closest("button[data-v]");
   if(bv){
     let v=bv.dataset.v;
     if(v==="__other"){v=(prompt("שם האחראי:")||"").trim();if(!v)return;}
-    snapshot();D[key][i].o=v;closeStMenu();save();render();
+    snapshot();D[key][i].o=v;
+    logAct('אחראי עודכן ל"'+v+'" — '+rowLabel(key,D[key][i]));
+    closeStMenu();save();render();
   }
 });
 
@@ -583,9 +639,11 @@ document.body.addEventListener("click",e=>{
   if(ob){e.stopPropagation();stTarget===ob?closeStMenu():openStMenu(ob,"owner");return}
   if(!e.target.closest("#stMenu"))closeStMenu();
   const del=e.target.closest(".rowdel");
-  if(del&&confirm("למחוק את השורה?")){snapshot();D[del.dataset.k].splice(+del.dataset.i,1);save();render();return}
+  if(del){snapshot();const r=D[del.dataset.k][+del.dataset.i];r.del=!r.del;
+    logAct((r.del?"ביטול שורה":"שחזור שורה")+" — "+rowLabel(del.dataset.k,r));save();render();return}
   const add=e.target.closest(".addrow");
-  if(add){snapshot();D[add.dataset.k].push(JSON.parse(add.parentElement.dataset.newrow));save();render();
+  if(add){snapshot();D[add.dataset.k].push(JSON.parse(add.parentElement.dataset.newrow));
+    logAct("הוספת שורה — "+(KEYLABEL[add.dataset.k]||add.dataset.k));save();render();
     const rows=add.parentElement.querySelectorAll("tbody tr");
     rows[rows.length-1]?.querySelector("[contenteditable]")?.focus();}
 });
@@ -593,7 +651,9 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeStMenu();});
 addEventListener("scroll",closeStMenu,{passive:true});
 document.body.addEventListener("change",e=>{
   const cb=e.target.closest('input[data-gg]');if(!cb)return;
-  snapshot();D.gonogo[+cb.dataset.gg].done=cb.checked;save();render();
+  snapshot();const g=D.gonogo[+cb.dataset.gg];g.done=cb.checked;
+  logAct('קריטריון Go/No-Go '+(g.done?"סומן כהושג":"בוטל סימונו")+": "+String(g.t).slice(0,45));
+  save();render();
 });
 document.body.addEventListener("focusout",e=>{
   const el=e.target.closest("[contenteditable][data-k]");if(!el)return;
@@ -602,6 +662,7 @@ document.body.addEventListener("focusout",e=>{
   if(v===String(old??""))return;
   snapshot();
   if(f)D[k][+i][f]=v;else D[k][+i]=v;
+  logAct('עריכת טקסט — '+rowLabel(k,typeof D[k][+i]==="object"?D[k][+i]:{t:v}));
   save();
   if(f==="d")render();
 });
