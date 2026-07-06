@@ -357,7 +357,8 @@ risks:[
  {t:"פס הייצור הקמעונאי: תיקוני סיטונאות עלולים לשבור לקוחות קיימים",m:"רגרסיה קמעונאית על כל שינוי רוחבי לפני שחרור",o:"תומר",s:0}
 ]};
 
-/* shared storage: data.json in the GitHub repo is the single source of truth */
+/* the old github.io address is retired — everyone lands on the one official site */
+if(location.hostname.endsWith("github.io"))location.replace("https://issta-xi.vercel.app/"+location.hash);
 /* shared datastore: data.json in the GitHub repo — one picture for everyone.
    The save key travels inside the shared link (#k=...) so nobody ever types it. */
 const REPO="sivanAssif/Issta",DATA_API=`https://api.github.com/repos/${REPO}/contents/data.json`;
