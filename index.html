@@ -358,15 +358,11 @@ risks:[
 ]};
 
 /* the old github.io address is retired — everyone lands on the one official site */
-if(location.hostname.endsWith("github.io"))location.replace("https://issta-xi.vercel.app/"+location.hash);
-/* shared datastore: data.json in the GitHub repo — one picture for everyone.
-   The save key travels inside the shared link (#k=...) so nobody ever types it. */
-const REPO="sivanAssif/Issta",DATA_API=`https://api.github.com/repos/${REPO}/contents/data.json`;
+if(location.hostname.endsWith("github.io"))location.replace("https://issta-xi.vercel.app/");
+/* shared datastore behind the site's own /api/data — no keys, everyone reads & writes */
+const DATA_API="https://issta-xi.vercel.app/api/data";
 let D=structuredClone(DEFAULT_DATA);
-if(location.hash.startsWith("#k=")){
-  localStorage.setItem("gh-token",decodeURIComponent(location.hash.slice(3)));
-  history.replaceState(null,"",location.pathname+location.search);
-}
+if(location.hash.startsWith("#k="))history.replaceState(null,"",location.pathname+location.search);
 
 /* identity for the update log — asked once per browser, on first open */
 function askName(force){
@@ -402,13 +398,9 @@ const b64enc=s=>{const u=new TextEncoder().encode(s);let r="";for(let i=0;i<u.le
 const b64dec=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g,"")),c=>c.charCodeAt(0)));
 
 async function loadRemote(){
-  const h={Accept:"application/vnd.github+json"};
-  const tok=localStorage.getItem("gh-token");
-  if(tok)h.Authorization="Bearer "+tok;
-  const r=await fetch(DATA_API+"?ref=main&_="+Date.now(),{headers:h,cache:"no-store"});
+  const r=await fetch(DATA_API+"?_="+Date.now(),{cache:"no-store"});
   if(!r.ok)throw new Error("HTTP "+r.status);
-  const meta=await r.json();
-  return {data:JSON.parse(b64dec(meta.content)),sha:meta.sha};
+  return {data:await r.json()};
 }
 async function boot(){
   askName(false);
@@ -448,20 +440,14 @@ function migrate(){
 let publishing=false;
 async function publish(){
   if(publishing){clearTimeout(pubTimer);pubTimer=setTimeout(publish,2000);return}
-  const tok=localStorage.getItem("gh-token");
-  if(!tok){syncNote("נפתח בלינק ישן — בקשו מסיוון את לינק העבודה המשותף","var(--warn)");publishing=false;return}
   publishing=true;syncNote("שומר ומשתף…","");
   try{
-    let sha;try{sha=(await loadRemote()).sha}catch(_){}
-    const body={message:"עדכון: "+getUser()+" — "+new Date().toLocaleString("he-IL"),content:b64enc(JSON.stringify(D,null,1)),branch:"main"};
-    if(sha)body.sha=sha;
     const r=await fetch(DATA_API,{method:"PUT",
-      headers:{Authorization:"Bearer "+tok,Accept:"application/vnd.github+json"},
-      body:JSON.stringify(body)});
-    if(r.status===409||r.status===422){clearTimeout(pubTimer);pubTimer=setTimeout(publish,8000);}
-    else if(!r.ok)syncNote("השמירה נכשלה ("+r.status+") — ינוסה שוב אוטומטית","var(--crit)");
+      headers:{"Content-Type":"application/json; charset=utf-8","X-User":encodeURIComponent(getUser())},
+      body:JSON.stringify(D)});
+    if(!r.ok){syncNote("השמירה נכשלה — ינוסה שוב אוטומטית","var(--crit)");
+      clearTimeout(pubTimer);pubTimer=setTimeout(publish,10000);}
     else{localStorage.setItem("issta-dirty","0");syncNote();}
-    if(r.status===401||r.status===403){syncNote("לינק העבודה התחדש — בקשו מסיוון את הלינק העדכני","var(--crit)");}
   }catch(e){syncNote("אין אינטרנט כרגע — השינויים שמורים וינוסו שוב אוטומטית","var(--warn)");
     clearTimeout(pubTimer);pubTimer=setTimeout(publish,15000);}
   publishing=false;
